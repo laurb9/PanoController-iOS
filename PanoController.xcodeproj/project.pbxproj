@@ -1,0 +1,446 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		D395703C1F2EC01900388325 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D395703B1F2EC01900388325 /* AppDelegate.swift */; };
+		D395703E1F2EC01900388325 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D395703D1F2EC01900388325 /* ViewController.swift */; };
+		D39570411F2EC01900388325 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D395703F1F2EC01900388325 /* Main.storyboard */; };
+		D39570441F2EC01900388325 /* PanoController.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = D39570421F2EC01900388325 /* PanoController.xcdatamodeld */; };
+		D39570461F2EC01900388325 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D39570451F2EC01900388325 /* Assets.xcassets */; };
+		D39570491F2EC01900388325 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D39570471F2EC01900388325 /* LaunchScreen.storyboard */; };
+		D39570541F2EC01A00388325 /* PanoControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D39570531F2EC01A00388325 /* PanoControllerTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		D39570501F2EC01A00388325 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D39570301F2EC01900388325 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D39570371F2EC01900388325;
+			remoteInfo = PanoController;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		D39570381F2EC01900388325 /* PanoController.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PanoController.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D395703B1F2EC01900388325 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		D395703D1F2EC01900388325 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		D39570401F2EC01900388325 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		D39570431F2EC01900388325 /* PanoController.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PanoController.xcdatamodel; sourceTree = "<group>"; };
+		D39570451F2EC01900388325 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		D39570481F2EC01900388325 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		D395704A1F2EC01A00388325 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D395704F1F2EC01A00388325 /* PanoControllerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PanoControllerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D39570531F2EC01A00388325 /* PanoControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanoControllerTests.swift; sourceTree = "<group>"; };
+		D39570551F2EC01A00388325 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D39570351F2EC01900388325 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D395704C1F2EC01A00388325 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D395702F1F2EC01900388325 = {
+			isa = PBXGroup;
+			children = (
+				D395703A1F2EC01900388325 /* PanoController */,
+				D39570521F2EC01A00388325 /* PanoControllerTests */,
+				D39570391F2EC01900388325 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D39570391F2EC01900388325 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D39570381F2EC01900388325 /* PanoController.app */,
+				D395704F1F2EC01A00388325 /* PanoControllerTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D395703A1F2EC01900388325 /* PanoController */ = {
+			isa = PBXGroup;
+			children = (
+				D395703B1F2EC01900388325 /* AppDelegate.swift */,
+				D395703D1F2EC01900388325 /* ViewController.swift */,
+				D395703F1F2EC01900388325 /* Main.storyboard */,
+				D39570451F2EC01900388325 /* Assets.xcassets */,
+				D39570471F2EC01900388325 /* LaunchScreen.storyboard */,
+				D395704A1F2EC01A00388325 /* Info.plist */,
+				D39570421F2EC01900388325 /* PanoController.xcdatamodeld */,
+			);
+			path = PanoController;
+			sourceTree = "<group>";
+		};
+		D39570521F2EC01A00388325 /* PanoControllerTests */ = {
+			isa = PBXGroup;
+			children = (
+				D39570531F2EC01A00388325 /* PanoControllerTests.swift */,
+				D39570551F2EC01A00388325 /* Info.plist */,
+			);
+			path = PanoControllerTests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D39570371F2EC01900388325 /* PanoController */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D39570581F2EC01A00388325 /* Build configuration list for PBXNativeTarget "PanoController" */;
+			buildPhases = (
+				D39570341F2EC01900388325 /* Sources */,
+				D39570351F2EC01900388325 /* Frameworks */,
+				D39570361F2EC01900388325 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PanoController;
+			productName = PanoController;
+			productReference = D39570381F2EC01900388325 /* PanoController.app */;
+			productType = "com.apple.product-type.application";
+		};
+		D395704E1F2EC01A00388325 /* PanoControllerTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D395705B1F2EC01A00388325 /* Build configuration list for PBXNativeTarget "PanoControllerTests" */;
+			buildPhases = (
+				D395704B1F2EC01A00388325 /* Sources */,
+				D395704C1F2EC01A00388325 /* Frameworks */,
+				D395704D1F2EC01A00388325 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D39570511F2EC01A00388325 /* PBXTargetDependency */,
+			);
+			name = PanoControllerTests;
+			productName = PanoControllerTests;
+			productReference = D395704F1F2EC01A00388325 /* PanoControllerTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D39570301F2EC01900388325 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0830;
+				LastUpgradeCheck = 0830;
+				ORGANIZATIONNAME = "Laurentiu Badea";
+				TargetAttributes = {
+					D39570371F2EC01900388325 = {
+						CreatedOnToolsVersion = 8.3.3;
+						DevelopmentTeam = GHP2FHS6KT;
+						ProvisioningStyle = Automatic;
+					};
+					D395704E1F2EC01A00388325 = {
+						CreatedOnToolsVersion = 8.3.3;
+						DevelopmentTeam = GHP2FHS6KT;
+						ProvisioningStyle = Automatic;
+						TestTargetID = D39570371F2EC01900388325;
+					};
+				};
+			};
+			buildConfigurationList = D39570331F2EC01900388325 /* Build configuration list for PBXProject "PanoController" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = D395702F1F2EC01900388325;
+			productRefGroup = D39570391F2EC01900388325 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D39570371F2EC01900388325 /* PanoController */,
+				D395704E1F2EC01A00388325 /* PanoControllerTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D39570361F2EC01900388325 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D39570491F2EC01900388325 /* LaunchScreen.storyboard in Resources */,
+				D39570461F2EC01900388325 /* Assets.xcassets in Resources */,
+				D39570411F2EC01900388325 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D395704D1F2EC01A00388325 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D39570341F2EC01900388325 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D395703E1F2EC01900388325 /* ViewController.swift in Sources */,
+				D39570441F2EC01900388325 /* PanoController.xcdatamodeld in Sources */,
+				D395703C1F2EC01900388325 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D395704B1F2EC01A00388325 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D39570541F2EC01A00388325 /* PanoControllerTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D39570511F2EC01A00388325 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D39570371F2EC01900388325 /* PanoController */;
+			targetProxy = D39570501F2EC01A00388325 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		D395703F1F2EC01900388325 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D39570401F2EC01900388325 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		D39570471F2EC01900388325 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D39570481F2EC01900388325 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		D39570561F2EC01A00388325 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D39570571F2EC01A00388325 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		D39570591F2EC01A00388325 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = GHP2FHS6KT;
+				INFOPLIST_FILE = PanoController/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.wotevah.PanoController;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Debug;
+		};
+		D395705A1F2EC01A00388325 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = GHP2FHS6KT;
+				INFOPLIST_FILE = PanoController/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.wotevah.PanoController;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Release;
+		};
+		D395705C1F2EC01A00388325 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = GHP2FHS6KT;
+				INFOPLIST_FILE = PanoControllerTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.wotevah.PanoControllerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PanoController.app/PanoController";
+			};
+			name = Debug;
+		};
+		D395705D1F2EC01A00388325 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = GHP2FHS6KT;
+				INFOPLIST_FILE = PanoControllerTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.wotevah.PanoControllerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PanoController.app/PanoController";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D39570331F2EC01900388325 /* Build configuration list for PBXProject "PanoController" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D39570561F2EC01A00388325 /* Debug */,
+				D39570571F2EC01A00388325 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D39570581F2EC01A00388325 /* Build configuration list for PBXNativeTarget "PanoController" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D39570591F2EC01A00388325 /* Debug */,
+				D395705A1F2EC01A00388325 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		D395705B1F2EC01A00388325 /* Build configuration list for PBXNativeTarget "PanoControllerTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D395705C1F2EC01A00388325 /* Debug */,
+				D395705D1F2EC01A00388325 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		D39570421F2EC01900388325 /* PanoController.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				D39570431F2EC01900388325 /* PanoController.xcdatamodel */,
+			);
+			currentVersion = D39570431F2EC01900388325 /* PanoController.xcdatamodel */;
+			path = PanoController.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = D39570301F2EC01900388325 /* Project object */;
+}
