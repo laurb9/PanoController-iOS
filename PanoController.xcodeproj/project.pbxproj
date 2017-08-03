@@ -8,12 +8,17 @@
 
 /* Begin PBXBuildFile section */
 		D395703C1F2EC01900388325 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D395703B1F2EC01900388325 /* AppDelegate.swift */; };
-		D395703E1F2EC01900388325 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D395703D1F2EC01900388325 /* ViewController.swift */; };
 		D39570411F2EC01900388325 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D395703F1F2EC01900388325 /* Main.storyboard */; };
 		D39570441F2EC01900388325 /* PanoController.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = D39570421F2EC01900388325 /* PanoController.xcdatamodeld */; };
 		D39570461F2EC01900388325 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D39570451F2EC01900388325 /* Assets.xcassets */; };
 		D39570491F2EC01900388325 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D39570471F2EC01900388325 /* LaunchScreen.storyboard */; };
 		D39570541F2EC01A00388325 /* PanoControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D39570531F2EC01A00388325 /* PanoControllerTests.swift */; };
+		D395705F1F2EC10A00388325 /* MenuTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D395705E1F2EC10A00388325 /* MenuTableViewController.swift */; };
+		D39570611F2EC51700388325 /* Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = D39570601F2EC51700388325 /* Menu.swift */; };
+		D39570631F30535200388325 /* OptionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D39570621F30535200388325 /* OptionViewController.swift */; };
+		D39570671F32F34F00388325 /* ToggleTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D39570661F32F34F00388325 /* ToggleTableViewCell.swift */; };
+		D39570691F32F38500388325 /* SelectTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D39570681F32F38500388325 /* SelectTableViewCell.swift */; };
+		D395706B1F32FE4600388325 /* RangeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D395706A1F32FE4600388325 /* RangeTableViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -28,8 +33,7 @@
 
 /* Begin PBXFileReference section */
 		D39570381F2EC01900388325 /* PanoController.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PanoController.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		D395703B1F2EC01900388325 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		D395703D1F2EC01900388325 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		D395703B1F2EC01900388325 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = AppDelegate.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		D39570401F2EC01900388325 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		D39570431F2EC01900388325 /* PanoController.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PanoController.xcdatamodel; sourceTree = "<group>"; };
 		D39570451F2EC01900388325 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -38,6 +42,12 @@
 		D395704F1F2EC01A00388325 /* PanoControllerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PanoControllerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D39570531F2EC01A00388325 /* PanoControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanoControllerTests.swift; sourceTree = "<group>"; };
 		D39570551F2EC01A00388325 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D395705E1F2EC10A00388325 /* MenuTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuTableViewController.swift; sourceTree = "<group>"; };
+		D39570601F2EC51700388325 /* Menu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Menu.swift; sourceTree = "<group>"; };
+		D39570621F30535200388325 /* OptionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptionViewController.swift; sourceTree = "<group>"; };
+		D39570661F32F34F00388325 /* ToggleTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToggleTableViewCell.swift; sourceTree = "<group>"; };
+		D39570681F32F38500388325 /* SelectTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectTableViewCell.swift; sourceTree = "<group>"; };
+		D395706A1F32FE4600388325 /* RangeTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RangeTableViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,12 +90,17 @@
 			isa = PBXGroup;
 			children = (
 				D395703B1F2EC01900388325 /* AppDelegate.swift */,
-				D395703D1F2EC01900388325 /* ViewController.swift */,
 				D395703F1F2EC01900388325 /* Main.storyboard */,
+				D39570621F30535200388325 /* OptionViewController.swift */,
 				D39570451F2EC01900388325 /* Assets.xcassets */,
 				D39570471F2EC01900388325 /* LaunchScreen.storyboard */,
 				D395704A1F2EC01A00388325 /* Info.plist */,
 				D39570421F2EC01900388325 /* PanoController.xcdatamodeld */,
+				D395705E1F2EC10A00388325 /* MenuTableViewController.swift */,
+				D39570661F32F34F00388325 /* ToggleTableViewCell.swift */,
+				D39570681F32F38500388325 /* SelectTableViewCell.swift */,
+				D395706A1F32FE4600388325 /* RangeTableViewCell.swift */,
+				D39570601F2EC51700388325 /* Menu.swift */,
 			);
 			path = PanoController;
 			sourceTree = "<group>";
@@ -204,9 +219,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D395703E1F2EC01900388325 /* ViewController.swift in Sources */,
 				D39570441F2EC01900388325 /* PanoController.xcdatamodeld in Sources */,
+				D39570671F32F34F00388325 /* ToggleTableViewCell.swift in Sources */,
+				D39570631F30535200388325 /* OptionViewController.swift in Sources */,
+				D395706B1F32FE4600388325 /* RangeTableViewCell.swift in Sources */,
 				D395703C1F2EC01900388325 /* AppDelegate.swift in Sources */,
+				D39570611F2EC51700388325 /* Menu.swift in Sources */,
+				D395705F1F2EC10A00388325 /* MenuTableViewController.swift in Sources */,
+				D39570691F32F38500388325 /* SelectTableViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
