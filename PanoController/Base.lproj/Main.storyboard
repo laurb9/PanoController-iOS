@@ -68,17 +68,17 @@
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinY="YES" flexibleMaxY="YES"/>
                                     <subviews>
-                                        <stackView opaque="NO" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" layoutMarginsFollowReadableWidth="YES" translatesAutoresizingMaskIntoConstraints="NO" id="h5M-MC-LWg">
+                                        <stackView opaque="NO" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" layoutMarginsFollowReadableWidth="YES" distribution="fillProportionally" translatesAutoresizingMaskIntoConstraints="NO" id="h5M-MC-LWg">
                                             <rect key="frame" x="8" y="20.5" width="359" height="3.5"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TyJ-sm-cb4">
-                                                    <rect key="frame" x="0.0" y="0.0" width="179.5" height="3.5"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="316" height="3.5"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="right" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0es-0F-1Od">
-                                                    <rect key="frame" x="179.5" y="0.0" width="181.5" height="3.5"/>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0es-0F-1Od">
+                                                    <rect key="frame" x="316" y="0.0" width="45" height="3.5"/>
                                                 </switch>
                                             </subviews>
                                         </stackView>
@@ -98,27 +98,34 @@
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="Range" id="w9V-8T-70p" customClass="RangeTableViewCell" customModule="PanoController" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="116" width="375" height="44"/>
-                                <autoresizingMask key="autoresizingMask"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="w9V-8T-70p" id="qbE-yg-h1o">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="43"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinY="YES" flexibleMaxY="YES"/>
                                     <subviews>
-                                        <stackView opaque="NO" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" layoutMarginsFollowReadableWidth="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vke-5V-99q">
+                                        <stackView opaque="NO" contentMode="scaleToFill" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="vke-5V-99q">
                                             <rect key="frame" x="8" y="20.5" width="359" height="3.5"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="L6P-Vb-x0b">
-                                                    <rect key="frame" x="0.0" y="0.0" width="179.5" height="3.5"/>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="281" placeholderIntrinsicHeight="16" text="Value" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="L6P-Vb-x0b">
+                                                    <rect key="frame" x="0.0" y="0.0" width="114.5" height="3.5"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" value="5" minValue="5" maxValue="180" translatesAutoresizingMaskIntoConstraints="NO" id="3y8-RQ-VZL">
-                                                    <rect key="frame" x="177.5" y="0.0" width="183.5" height="4.5"/>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="right" lineBreakMode="wordWrap" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nih-ml-6y0">
+                                                    <rect key="frame" x="122.5" y="0.0" width="106" height="3.5"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
+                                                    <color key="textColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <slider opaque="NO" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="fill" contentVerticalAlignment="center" value="5" minValue="5" maxValue="180" translatesAutoresizingMaskIntoConstraints="NO" id="3y8-RQ-VZL">
+                                                    <rect key="frame" x="234.5" y="0.0" width="126.5" height="4.5"/>
+                                                    <connections>
+                                                        <action selector="touchUpInside:" destination="w9V-8T-70p" eventType="touchUpInside" id="ceV-HU-lTi"/>
+                                                        <action selector="valueChanged:" destination="w9V-8T-70p" eventType="valueChanged" id="qPf-ZG-3aw"/>
+                                                    </connections>
                                                 </slider>
                                             </subviews>
-                                            <constraints>
-                                                <constraint firstItem="3y8-RQ-VZL" firstAttribute="width" secondItem="L6P-Vb-x0b" secondAttribute="width" id="hFv-0F-5wC"/>
-                                            </constraints>
                                         </stackView>
                                     </subviews>
                                     <constraints>
@@ -132,6 +139,7 @@
                                 <connections>
                                     <outlet property="nameLabel" destination="L6P-Vb-x0b" id="3hN-BV-nug"/>
                                     <outlet property="slider" destination="3y8-RQ-VZL" id="NxW-1T-3sJ"/>
+                                    <outlet property="valueLabel" destination="nih-ml-6y0" id="omn-Hy-rQI"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>

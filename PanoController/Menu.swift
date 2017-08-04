@@ -31,10 +31,14 @@ class ListSelector: MenuItem {
     var current: Int = 0
     init(_ name: String, options: [Option]){
         self.options = options
-        for i in 0..<options.count {
-            if options[i].isDefault {
-                current = i
-                break
+        if let savedCurrent = UserDefaults.standard.object(forKey: name) as? Int {
+            current = savedCurrent
+        } else {
+            for i in 0..<options.count {
+                if options[i].isDefault {
+                    current = i
+                    break
+                }
             }
         }
         super.init(name)
@@ -51,7 +55,7 @@ class RangeSelector: MenuItem {
     init(_ name: String, min: Int, max: Int, defaultValue: Int){
         self.min = min
         self.max = max
-        current = defaultValue
+        current = UserDefaults.standard.object(forKey: name) as? Int ?? defaultValue
         super.init(name)
     }
 }
@@ -59,6 +63,7 @@ class RangeSelector: MenuItem {
 class Switch: MenuItem {
     var currentState: Bool
     init(_ name: String, _ defaultState: Bool){
+        currentState = UserDefaults.standard.object(forKey: name) as? Bool ?? defaultState
         self.currentState = defaultState
         super.init(name)
     }
@@ -152,7 +157,7 @@ var menus = [
             ]),
         ListSelector("Aspect Ratio", options: [
             Option("Portrait 2:3", 23),
-            Option("Lanscape 3:2", 32, isDefault: true),
+            Option("Landscape 3:2", 32, isDefault: true),
             ]),
     ]),
     Menu("🛠 Advanced", entries: [

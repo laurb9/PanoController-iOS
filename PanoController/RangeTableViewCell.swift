@@ -10,6 +10,7 @@ import UIKit
 
 class RangeTableViewCell: UITableViewCell {
     @IBOutlet var nameLabel: UILabel!
+    @IBOutlet weak var valueLabel: UILabel!
     @IBOutlet var slider: UISlider!
 
     override func awakeFromNib() {
@@ -23,4 +24,11 @@ class RangeTableViewCell: UITableViewCell {
         // Configure the view for the selected state
     }
 
+    @IBAction func valueChanged(_ sender: Any) {
+        let value = lroundf(slider.value) / 5 * 5
+        valueLabel?.text = "\(value)º"
+    }
+    @IBAction func touchUpInside(_ sender: Any) {
+        return valueChanged(sender)
+    }
 }

@@ -70,6 +70,7 @@ class MenuTableViewController: UITableViewController {
             cell = tableView.dequeueReusableCell(withIdentifier: "Range", for: indexPath)
             let rangeCell = cell as! RangeTableViewCell
             rangeCell.nameLabel?.text = rangeControl.name
+            rangeCell.valueLabel?.text = "\(Int(rangeControl.current))º"
             rangeCell.slider.maximumValue = Float(rangeControl.max)
             rangeCell.slider.minimumValue = Float(rangeControl.min) as Float
             rangeCell.slider.setValue(Float(rangeControl.current), animated: false)
