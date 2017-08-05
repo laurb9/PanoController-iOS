@@ -84,10 +84,6 @@ class Menu: NSObject {
 
 var menus = [
     Menu("🌄 Pano", entries: [
-        ActionItem("New Pano"),
-        ActionItem("Repeat Last"),
-        ActionItem("360 Pano"),
-        ActionItem("Last Pano Info"),
         RangeSelector("Horizontal FOV", min: 5, max: 360, defaultValue: 120),
         RangeSelector("Vertical FOV", min: 5, max: 180, defaultValue: 90),
         ]),

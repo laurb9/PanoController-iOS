@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="0jq-39-Kas">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="o8c-XN-eua">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -113,13 +113,13 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="right" lineBreakMode="wordWrap" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nih-ml-6y0">
-                                                    <rect key="frame" x="122.5" y="0.0" width="54" height="15.5"/>
+                                                    <rect key="frame" x="122.5" y="0.0" width="46" height="15.5"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
                                                     <color key="textColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <slider opaque="NO" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="fill" contentVerticalAlignment="center" value="5" minValue="5" maxValue="180" translatesAutoresizingMaskIntoConstraints="NO" id="3y8-RQ-VZL">
-                                                    <rect key="frame" x="182.5" y="0.0" width="178.5" height="16.5"/>
+                                                    <rect key="frame" x="174.5" y="0.0" width="186.5" height="16.5"/>
                                                     <connections>
                                                         <action selector="touchUpInside:" destination="w9V-8T-70p" eventType="touchUpInside" id="ceV-HU-lTi"/>
                                                         <action selector="valueChanged:" destination="w9V-8T-70p" eventType="valueChanged" id="qPf-ZG-3aw"/>
@@ -153,12 +153,12 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="jyX-GO-sDe" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="928.79999999999995" y="178.56071964017991"/>
+            <point key="canvasLocation" x="1868" y="178.56071964017991"/>
         </scene>
         <!--Option View Controller-->
         <scene sceneID="LxV-k7-CZT">
             <objects>
-                <tableViewController id="OaZ-1q-1SY" customClass="OptionViewController" customModule="PanoController" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController hidesBottomBarWhenPushed="YES" id="OaZ-1q-1SY" customClass="OptionViewController" customModule="PanoController" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="n2d-7o-6Oe">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -191,12 +191,13 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="yqG-kb-TBE" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1734" y="176"/>
+            <point key="canvasLocation" x="2672.8000000000002" y="175.86206896551727"/>
         </scene>
-        <!--Navigation Controller-->
+        <!--Settings-->
         <scene sceneID="bJH-vp-1it">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="0jq-39-Kas" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Settings" id="6iO-Jx-uNa"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="h6t-U2-MaM">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
@@ -208,6 +209,111 @@
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0Ds-YD-HI6" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="928.79999999999995" y="178.56071964017991"/>
+        </scene>
+        <!--Pano-->
+        <scene sceneID="w0X-g9-Enc">
+            <objects>
+                <tableViewController id="FOU-fT-hSb" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="none" rowHeight="44" sectionHeaderHeight="18" sectionFooterHeight="18" id="nqN-JV-gUd">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                        <sections>
+                            <tableViewSection headerTitle="Start" id="bv8-TW-psX">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="fB6-7Y-1Or">
+                                        <rect key="frame" x="0.0" y="55.5" width="375" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="fB6-7Y-1Or" id="k6C-hq-Sr0">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="B3k-z3-e1X">
+                                                    <rect key="frame" x="8" y="7" width="69" height="30"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <state key="normal" title="New Pano"/>
+                                                </button>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="9NH-nc-tdg">
+                                        <rect key="frame" x="0.0" y="99.5" width="375" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="9NH-nc-tdg" id="sMN-MK-r0q">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4Ds-Me-Wk3">
+                                                    <rect key="frame" x="8" y="7" width="101" height="30"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <state key="normal" title="New 360 Pano"/>
+                                                </button>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="Eww-ie-397">
+                                        <rect key="frame" x="0.0" y="143.5" width="375" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Eww-ie-397" id="h39-9A-pmn">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ssc-4D-zdD">
+                                                    <rect key="frame" x="8" y="7" width="120" height="30"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <state key="normal" title="Repeat Last Pano"/>
+                                                </button>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                        </sections>
+                        <connections>
+                            <outlet property="dataSource" destination="FOU-fT-hSb" id="fW3-4j-1Tc"/>
+                            <outlet property="delegate" destination="FOU-fT-hSb" id="Z3e-ML-HjT"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Pano" id="njK-CA-BSe"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="mVF-nX-a9T" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1868" y="946"/>
+        </scene>
+        <!--Pano-->
+        <scene sceneID="kz2-VX-324">
+            <objects>
+                <navigationController id="kxH-7d-jtZ" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Pano" id="I9W-ab-20p"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="Rbg-aH-g80">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="FOU-fT-hSb" kind="relationship" relationship="rootViewController" id="eVQ-jd-bLQ"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="eJm-EH-tAN" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="929" y="946"/>
+        </scene>
+        <!--Tab Bar Controller-->
+        <scene sceneID="Xam-75-ASk">
+            <objects>
+                <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="o8c-XN-eua" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <tabBar key="tabBar" contentMode="scaleToFill" id="w7d-wB-h2c">
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    </tabBar>
+                    <connections>
+                        <segue destination="kxH-7d-jtZ" kind="relationship" relationship="viewControllers" id="EkB-UV-R6a"/>
+                        <segue destination="0jq-39-Kas" kind="relationship" relationship="viewControllers" id="WlS-zJ-rA9"/>
+                    </connections>
+                </tabBarController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="aZb-3R-4fw" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-10.4" y="178.56071964017991"/>
         </scene>
