@@ -41,7 +41,7 @@ class OptionViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Option", for: indexPath)
 
         cell.textLabel?.text = menuItem!.options[indexPath.row].name
-        cell.accessoryType = menuItem!.options[indexPath.row].isDefault ? .checkmark : .none
+        cell.accessoryType = indexPath.row == menuItem?.current ? .checkmark : .none
         return cell
     }
 
@@ -79,6 +79,13 @@ class OptionViewController: UITableViewController {
         return true
     }
     */
+
+    override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
+        let oldSelectedIndexPath = IndexPath(row: menuItem!.current, section: 0)
+        menuItem!.current = indexPath.row
+        tableView.reloadRows(at: [oldSelectedIndexPath, indexPath], with: .none)
+        return indexPath
+    }
 
     // MARK: - Navigation
 

@@ -9,8 +9,7 @@
 import UIKit
 
 class MenuTableViewController: UITableViewController {
-
-    override func viewDidLoad() {
+  override func viewDidLoad() {
         super.viewDidLoad()
 
         tableView.estimatedRowHeight = 24.0
@@ -51,12 +50,6 @@ class MenuTableViewController: UITableViewController {
             let selectCell = cell as! SelectTableViewCell
             selectCell.nameLabel?.text = listSelector.name
             selectCell.valueLabel?.text = listSelector.currentOptionName()
-            cell.accessoryType = .disclosureIndicator
-
-        } else if let actionItem = menuItem as? ActionItem {
-            cell = tableView.dequeueReusableCell(withIdentifier: "Select", for: indexPath)
-            let selectCell = cell as! SelectTableViewCell
-            selectCell.nameLabel?.text = actionItem.name
             cell.accessoryType = .disclosureIndicator
 
         } else if let switchControl = menuItem as? Switch {
@@ -113,17 +106,43 @@ class MenuTableViewController: UITableViewController {
     }
     */
 
+    // MARK: - Save Settings
+
+    @IBAction func rangeUpdated(_ sender: UISlider) {
+        let switchPosition = sender.convert(CGPoint.zero, to: tableView)
+        if let indexPath = tableView.indexPathForRow(at: switchPosition),
+            let menuItem = menus[indexPath.section].entries[indexPath.row] as? RangeSelector {
+            menuItem.current = Int(sender.value)
+        }
+    }
+
+    @IBAction func toggleChanged(_ sender: UISwitch) {
+        let switchPosition = sender.convert(CGPoint.zero, to: tableView)
+        if let indexPath = tableView.indexPathForRow(at: switchPosition),
+            let menuItem = menus[indexPath.section].entries[indexPath.row] as? Switch {
+            menuItem.currentState = sender.isOn
+        }
+    }
 
     // MARK: - Navigation
+
+    @IBAction func unwindToSettings(sender: UIStoryboardSegue){
+        //if let _ = sender.source as? OptionViewController,
+        //}
+        if let selectedIndexPath = tableView.indexPathForSelectedRow {
+            tableView.reloadRows(at: [selectedIndexPath], with: .none)
+        }
+        // should save
+    }
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showOptions" {
-            if let indexPath = tableView.indexPathForSelectedRow {
-                let destinationController = segue.destination as! OptionViewController
-                destinationController.menuItem = menus[indexPath.section].entries[indexPath.row] as? ListSelector
-                destinationController.title = destinationController.menuItem?.name
-            }
+            let destinationController = segue.destination as! OptionViewController
+            let listSelector = sender as! SelectTableViewCell
+            let indexPath = tableView.indexPath(for: listSelector)!
+            destinationController.menuItem = menus[indexPath.section].entries[indexPath.row] as? ListSelector
+            destinationController.title = destinationController.menuItem?.name
         }
     }
 }

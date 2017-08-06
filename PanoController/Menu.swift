@@ -9,9 +9,9 @@
 import Foundation
 
 class Option: NSObject {
-    var name: String
-    var value: Int
-    var isDefault: Bool = false
+    let name: String
+    let value: Int
+    let isDefault: Bool
     init(_ name: String, _ value: Int, isDefault: Bool = false){
         self.name = name
         self.value = value
@@ -20,14 +20,14 @@ class Option: NSObject {
 }
 
 class MenuItem: NSObject {
-    var name: String
+    let name: String
     init(_ name: String){
         self.name = name
     }
 }
 
 class ListSelector: MenuItem {
-    var options: [Option]
+    let options: [Option]
     var current: Int = 0
     init(_ name: String, options: [Option]){
         self.options = options
@@ -49,8 +49,8 @@ class ListSelector: MenuItem {
 }
 
 class RangeSelector: MenuItem {
-    var min: Int
-    var max: Int
+    let min: Int
+    let max: Int
     var current: Int
     init(_ name: String, min: Int, max: Int, defaultValue: Int){
         self.min = min
@@ -69,20 +69,16 @@ class Switch: MenuItem {
     }
 }
 
-class ActionItem: MenuItem {
-
-}
-
 class Menu: NSObject {
-    var name: String
-    var entries: [MenuItem]
+    let name: String
+    let entries: [MenuItem]
     init(_ name: String, entries: [MenuItem]){
         self.name = name
         self.entries = entries
     }
 }
 
-var menus = [
+let menus = [
     Menu("🌄 Pano", entries: [
         RangeSelector("Horizontal FOV", min: 5, max: 360, defaultValue: 120),
         RangeSelector("Vertical FOV", min: 5, max: 180, defaultValue: 90),

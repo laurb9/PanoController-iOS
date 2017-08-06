@@ -12,6 +12,7 @@ class RangeTableViewCell: UITableViewCell {
     @IBOutlet var nameLabel: UILabel!
     @IBOutlet weak var valueLabel: UILabel!
     @IBOutlet var slider: UISlider!
+    let MULTIPLE = 5
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -24,8 +25,9 @@ class RangeTableViewCell: UITableViewCell {
         // Configure the view for the selected state
     }
 
+    // Make the slider use MULTIPLEs
     @IBAction func valueChanged(_ sender: Any) {
-        let value = lroundf(slider.value) / 5 * 5
+        let value = lroundf(slider.value) / MULTIPLE * MULTIPLE
         valueLabel?.text = "\(value)º"
     }
     @IBAction func touchUpInside(_ sender: Any) {
