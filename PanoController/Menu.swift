@@ -28,7 +28,11 @@ class MenuItem: NSObject {
 
 class ListSelector: MenuItem {
     let options: [Option]
-    var current: Int = 0
+    var current: Int = 0 {
+        didSet {
+            UserDefaults.standard.set(current, forKey: name)
+        }
+    }
     init(_ name: String, options: [Option]){
         self.options = options
         if let savedCurrent = UserDefaults.standard.object(forKey: name) as? Int {
@@ -51,7 +55,11 @@ class ListSelector: MenuItem {
 class RangeSelector: MenuItem {
     let min: Int
     let max: Int
-    var current: Int
+    var current: Int {
+        didSet {
+            UserDefaults.standard.set(current, forKey: name)
+        }
+    }
     init(_ name: String, min: Int, max: Int, defaultValue: Int){
         self.min = min
         self.max = max
@@ -61,7 +69,11 @@ class RangeSelector: MenuItem {
 }
 
 class Switch: MenuItem {
-    var currentState: Bool
+    var currentState: Bool {
+        didSet {
+            UserDefaults.standard.set(currentState, forKey: name)
+        }
+    }
     init(_ name: String, _ defaultState: Bool){
         currentState = UserDefaults.standard.object(forKey: name) as? Bool ?? defaultState
         self.currentState = defaultState
