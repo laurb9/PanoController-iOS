@@ -50,7 +50,6 @@ class MenuTableViewController: UITableViewController {
             let selectCell = cell as! SelectTableViewCell
             selectCell.nameLabel?.text = listSelector.name
             selectCell.valueLabel?.text = listSelector.currentOptionName()
-            cell.accessoryType = .disclosureIndicator
 
         } else if let switchControl = menuItem as? Switch {
             cell = tableView.dequeueReusableCell(withIdentifier: "Toggle", for: indexPath)
