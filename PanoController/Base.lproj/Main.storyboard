@@ -6,7 +6,6 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
-        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -345,16 +344,13 @@
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Device" lineBreakMode="wordWrap" numberOfLines="0" minimumScaleFactor="0.5" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GXb-Xf-cuA">
-                                                    <rect key="frame" x="14" y="14" width="323.5" height="15.5"/>
+                                                    <rect key="frame" x="14" y="14" width="169.5" height="15.5"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preservesSuperviewLayoutMargins="YES" layoutMarginsFollowReadableWidth="YES" hidesWhenStopped="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="SUk-m9-7Dl">
-                                                    <rect key="frame" x="345.5" y="14" width="15.5" height="15.5"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="width" secondItem="SUk-m9-7Dl" secondAttribute="height" multiplier="1:1" id="kyk-NW-R0n"/>
-                                                    </constraints>
+                                                    <rect key="frame" x="191.5" y="14" width="169.5" height="15.5"/>
                                                 </activityIndicatorView>
                                             </subviews>
                                             <edgeInsets key="layoutMargins" top="14" left="14" bottom="14" right="14"/>
