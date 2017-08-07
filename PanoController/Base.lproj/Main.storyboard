@@ -6,6 +6,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -41,9 +42,6 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                             </subviews>
-                                            <constraints>
-                                                <constraint firstAttribute="trailing" secondItem="UWH-VA-Ifv" secondAttribute="trailing" id="m3o-eO-3oM"/>
-                                            </constraints>
                                             <edgeInsets key="layoutMargins" top="14" left="14" bottom="14" right="0.0"/>
                                         </stackView>
                                     </subviews>
@@ -330,19 +328,49 @@
         <!--Connect-->
         <scene sceneID="R7P-UJ-fR8">
             <objects>
-                <tableViewController id="seK-A8-ONf" sceneMemberID="viewController">
+                <tableViewController id="seK-A8-ONf" customClass="DeviceTableViewController" customModule="PanoController" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="E6u-da-VnT">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="BTDevice" id="WPd-dR-xUg">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="BTPeripheral" id="WPd-dR-xUg" customClass="DeviceTableViewCell" customModule="PanoController" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="28" width="375" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="WPd-dR-xUg" id="zl4-Vu-wQ1">
-                                    <rect key="frame" x="0.0" y="0.0" width="342" height="44"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                     <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <stackView opaque="NO" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" layoutMarginsFollowReadableWidth="YES" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="RA9-tB-060">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Device" lineBreakMode="wordWrap" numberOfLines="0" minimumScaleFactor="0.5" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GXb-Xf-cuA">
+                                                    <rect key="frame" x="14" y="14" width="323.5" height="15.5"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preservesSuperviewLayoutMargins="YES" layoutMarginsFollowReadableWidth="YES" hidesWhenStopped="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="SUk-m9-7Dl">
+                                                    <rect key="frame" x="345.5" y="14" width="15.5" height="15.5"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" secondItem="SUk-m9-7Dl" secondAttribute="height" multiplier="1:1" id="kyk-NW-R0n"/>
+                                                    </constraints>
+                                                </activityIndicatorView>
+                                            </subviews>
+                                            <edgeInsets key="layoutMargins" top="14" left="14" bottom="14" right="14"/>
+                                        </stackView>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstAttribute="bottom" secondItem="RA9-tB-060" secondAttribute="bottom" id="5Sp-aK-LiV"/>
+                                        <constraint firstAttribute="trailing" secondItem="RA9-tB-060" secondAttribute="trailing" id="TlJ-1v-2c6"/>
+                                        <constraint firstItem="RA9-tB-060" firstAttribute="leading" secondItem="zl4-Vu-wQ1" secondAttribute="leading" id="oZf-wP-OyH"/>
+                                        <constraint firstItem="RA9-tB-060" firstAttribute="top" secondItem="zl4-Vu-wQ1" secondAttribute="top" id="u4Q-n0-2Wm"/>
+                                    </constraints>
                                 </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="connectingView" destination="SUk-m9-7Dl" id="e1H-zy-Thz"/>
+                                    <outlet property="nameView" destination="GXb-Xf-cuA" id="W8k-9l-OGo"/>
+                                </connections>
                             </tableViewCell>
                         </prototypes>
                         <connections>
