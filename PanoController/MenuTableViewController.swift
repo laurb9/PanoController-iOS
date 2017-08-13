@@ -48,20 +48,20 @@ class MenuTableViewController: UITableViewController {
         let cell: UITableViewCell
         let menuItem = menus[indexPath.section].entries[indexPath.row]
 
-        if let listSelector = menuItem as? ListSelector {
+        switch menuItem {
+        case let listSelector as ListSelector:
             cell = tableView.dequeueReusableCell(withIdentifier: "Select", for: indexPath)
             let selectCell = cell as! SelectTableViewCell
             selectCell.nameLabel?.text = listSelector.name
             selectCell.valueLabel?.text = listSelector.currentOptionName()
 
-        } else if let switchControl = menuItem as? Switch {
+        case let switchControl as Switch:
             cell = tableView.dequeueReusableCell(withIdentifier: "Toggle", for: indexPath)
             let toggleCell = cell as! ToggleTableViewCell
             toggleCell.nameLabel?.text = switchControl.name
             toggleCell.switchView?.isOn = switchControl.currentState
 
-        } else {
-            let rangeControl = menuItem as! RangeSelector
+        case let rangeControl as RangeSelector:
             cell = tableView.dequeueReusableCell(withIdentifier: "Range", for: indexPath)
             let rangeCell = cell as! RangeTableViewCell
             rangeCell.nameLabel?.text = rangeControl.name
@@ -69,6 +69,9 @@ class MenuTableViewController: UITableViewController {
             rangeCell.slider.maximumValue = Float(rangeControl.max)
             rangeCell.slider.minimumValue = Float(rangeControl.min) as Float
             rangeCell.slider.setValue(Float(rangeControl.current), animated: false)
+        default:
+            cell = UITableViewCell()
+            print("Unknown menuItem \(menuItem) at \(indexPath)")
         }
         return cell
     }
