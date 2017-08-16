@@ -19,6 +19,7 @@
 		D39570671F32F34F00388325 /* ToggleTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D39570661F32F34F00388325 /* ToggleTableViewCell.swift */; };
 		D39570691F32F38500388325 /* SelectTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D39570681F32F38500388325 /* SelectTableViewCell.swift */; };
 		D395706B1F32FE4600388325 /* RangeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D395706A1F32FE4600388325 /* RangeTableViewCell.swift */; };
+		D3B17B741F4018B800A7F6F1 /* PanoPeripheral.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3B17B731F4018B800A7F6F1 /* PanoPeripheral.swift */; };
 		D3ED73CA1F377904000C8A97 /* DeviceTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3ED73C91F377904000C8A97 /* DeviceTableViewController.swift */; };
 		D3ED73CC1F377953000C8A97 /* DeviceTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3ED73CB1F377953000C8A97 /* DeviceTableViewCell.swift */; };
 		D3ED73CF1F377CB9000C8A97 /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3ED73CE1F377CB9000C8A97 /* CoreBluetooth.framework */; };
@@ -51,6 +52,7 @@
 		D39570661F32F34F00388325 /* ToggleTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToggleTableViewCell.swift; sourceTree = "<group>"; };
 		D39570681F32F38500388325 /* SelectTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectTableViewCell.swift; sourceTree = "<group>"; };
 		D395706A1F32FE4600388325 /* RangeTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RangeTableViewCell.swift; sourceTree = "<group>"; };
+		D3B17B731F4018B800A7F6F1 /* PanoPeripheral.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PanoPeripheral.swift; sourceTree = "<group>"; };
 		D3ED73C91F377904000C8A97 /* DeviceTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = DeviceTableViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		D3ED73CB1F377953000C8A97 /* DeviceTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = DeviceTableViewCell.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		D3ED73CE1F377CB9000C8A97 /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
@@ -104,13 +106,14 @@
 				D395704A1F2EC01A00388325 /* Info.plist */,
 				D39570421F2EC01900388325 /* PanoController.xcdatamodeld */,
 				D395705E1F2EC10A00388325 /* MenuTableViewController.swift */,
+				D39570601F2EC51700388325 /* Menu.swift */,
 				D39570681F32F38500388325 /* SelectTableViewCell.swift */,
 				D39570661F32F34F00388325 /* ToggleTableViewCell.swift */,
 				D395706A1F32FE4600388325 /* RangeTableViewCell.swift */,
 				D39570621F30535200388325 /* OptionViewController.swift */,
 				D3ED73C91F377904000C8A97 /* DeviceTableViewController.swift */,
 				D3ED73CB1F377953000C8A97 /* DeviceTableViewCell.swift */,
-				D39570601F2EC51700388325 /* Menu.swift */,
+				D3B17B731F4018B800A7F6F1 /* PanoPeripheral.swift */,
 			);
 			path = PanoController;
 			sourceTree = "<group>";
@@ -243,6 +246,7 @@
 				D395706B1F32FE4600388325 /* RangeTableViewCell.swift in Sources */,
 				D395703C1F2EC01900388325 /* AppDelegate.swift in Sources */,
 				D3ED73CC1F377953000C8A97 /* DeviceTableViewCell.swift in Sources */,
+				D3B17B741F4018B800A7F6F1 /* PanoPeripheral.swift in Sources */,
 				D39570611F2EC51700388325 /* Menu.swift in Sources */,
 				D395705F1F2EC10A00388325 /* MenuTableViewController.swift in Sources */,
 				D3ED73CA1F377904000C8A97 /* DeviceTableViewController.swift in Sources */,

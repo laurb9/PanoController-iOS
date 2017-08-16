@@ -12,9 +12,10 @@
 import CoreBluetooth
 import UIKit
 
-class DeviceTableViewController: UITableViewController, CBCentralManagerDelegate, CBPeripheralDelegate {
+class DeviceTableViewController: UITableViewController, CBCentralManagerDelegate {
     var bleManager: CBCentralManager!
     var peripheral: CBPeripheral?
+    var panoPeripheral: PanoPeripheral?
     var peripherals: [CBPeripheral] = []
 
     override func viewDidLoad() {
@@ -143,13 +144,13 @@ class DeviceTableViewController: UITableViewController, CBCentralManagerDelegate
             // check if this device wasn't added already
             peripherals.filter({$0.identifier == peripheral.identifier}).count == 0 &&
             // and that we can connect to it
-            capabilities.object(forKey: CBAdvertisementDataIsConnectable) as? Bool ?? false {
+            capabilities.object(forKey: CBAdvertisementDataIsConnectable) as? Bool ?? false,
+            let dataServices = capabilities.object(forKey: CBAdvertisementDataServiceUUIDsKey) as? NSArray,
+            // We are only looking for devices that have the PanoController Service
+            dataServices.contains(PanoPeripheral.PanoControllerService.UUID) {
 
             print("New peripheral \(peripheral) \(RSSI)")
-            peripheral.delegate = self
             print(capabilities.description)
-            //let dataServices = capabilities.object(forKey: CBAdvertisementDataServiceUUIDsKey) as? NSArray
-            //print(dataServices?.description ?? "No Data Services")
             peripherals.append(peripheral)
             tableView.reloadData()
         }
@@ -157,53 +158,22 @@ class DeviceTableViewController: UITableViewController, CBCentralManagerDelegate
 
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         print("didConnect \(peripheral.name!)")
-        peripheral.discoverServices(nil)
+        panoPeripheral = PanoPeripheral(peripheral)
         tableView.reloadData()
     }
 
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
         print("didFailToConnect: \(String(describing: error))")
         self.peripheral = nil
+        self.panoPeripheral = nil
         central.scanForPeripherals(withServices: nil, options: nil)
     }
 
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
         print("didDisconnectPeripheral: \(peripheral.name!)")
         self.peripheral = nil
+        self.panoPeripheral = nil
         central.scanForPeripherals(withServices: nil, options: nil)
         tableView.reloadData()
-    }
-
-    func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
-        print("Services for \(peripheral.name!)")
-        for service in peripheral.services! {
-            let thisService = service as CBService
-            print("    ", thisService)
-            peripheral.discoverCharacteristics(nil, for: thisService)
-        }
-    }
-
-    func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
-        print("    Characteristics for \(String(describing: service))")
-        for characteristic in service.characteristics! {
-            let thisCharacteristic = characteristic as CBCharacteristic
-            print("         ", thisCharacteristic)
-            peripheral.discoverDescriptors(for: thisCharacteristic)
-        }
-    }
-
-    func peripheral(_ peripheral: CBPeripheral, didDiscoverDescriptorsFor characteristic: CBCharacteristic, error: Error?) {
-        print("          Descriptors for \(String(describing: characteristic))")
-        for descriptor in characteristic.descriptors! {
-            let thisDescriptor = descriptor as CBDescriptor
-            print("             ", thisDescriptor)
-        }
-    }
-
-    func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
-        print("didUpdateValueFor \(String(describing: characteristic))")
-        if characteristic.uuid == CBUUID(string: "123456"){
-            print(characteristic.value!)
-        }
     }
 }
