@@ -10,6 +10,9 @@ import Foundation
 import CoreBluetooth
 
 class PanoPeripheral : NSObject, CBPeripheralDelegate {
+    var status: Status
+    var config: Config
+
     struct PanoControllerService {
         static let UUID = CBUUID(string: "2017")
         struct ConfigCharacteristic {
@@ -22,6 +25,8 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate {
     var peripheral: CBPeripheral?
 
     init(_ peripheral: CBPeripheral) {
+        status = Status()
+        config = Config() // should load from settings
         super.init()
         self.peripheral = peripheral
         self.peripheral!.delegate = self
@@ -44,6 +49,14 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate {
         for characteristic in service.characteristics! {
             let thisCharacteristic = characteristic as CBCharacteristic
             print("         ", thisCharacteristic)
+            if thisCharacteristic.uuid == PanoControllerService.StatusCharacteristic.UUID {
+                peripheral.setNotifyValue(true, for: thisCharacteristic)
+                peripheral.readValue(for: thisCharacteristic)
+            }
+            if thisCharacteristic.uuid == PanoControllerService.ConfigCharacteristic.UUID {
+                //print("sending \(config.pack())")
+                //peripheral.writeValue(config.pack(), for: thisCharacteristic, type: .withoutResponse)
+            }
             //peripheral.discoverDescriptors(for: thisCharacteristic)
         }
     }
@@ -58,8 +71,21 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate {
 
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         print("didUpdateValueFor \(String(describing: characteristic))")
-        if characteristic.uuid == CBUUID(string: "123456"){
+        switch characteristic.uuid {
+        case PanoControllerService.ConfigCharacteristic.UUID:
             print(characteristic.value!)
+
+        case PanoControllerService.StatusCharacteristic.UUID:
+            print(characteristic.value!)
+            status.update(with: characteristic.value!)
+            print(status)
+
+        default:
+            print("Received update for unknown characteristic \(String(describing: characteristic))")
         }
+    }
+
+    func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
+        print("didUpdateNotificationStateFor \(String(describing: characteristic))")
     }
 }
