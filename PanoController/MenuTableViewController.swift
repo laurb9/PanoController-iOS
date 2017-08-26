@@ -117,7 +117,7 @@ class MenuTableViewController: UITableViewController {
         let switchPosition = sender.convert(CGPoint.zero, to: tableView)
         if let indexPath = tableView.indexPathForRow(at: switchPosition),
             let menuItem = menus[indexPath] as? RangeSelector {
-            menuItem.current = Int(sender.value)
+            menuItem.current = Int16(Int(sender.value))
         }
     }
 

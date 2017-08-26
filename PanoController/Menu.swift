@@ -13,9 +13,9 @@ import Foundation
 
 class Option: NSObject {
     let name: String
-    let value: Int
+    let value: Int16
     let isDefault: Bool
-    init(_ name: String, _ value: Int, isDefault: Bool = false){
+    init(_ name: String, _ value: Int16, isDefault: Bool = false){
         self.name = name
         self.value = value
         self.isDefault = isDefault
@@ -24,7 +24,7 @@ class Option: NSObject {
 
 class MenuItem: NSObject {
     let name: String
-    let destination: Int16?
+    var destination: Int16?
     init(_ name: String, using destination: Int16? = nil){
         self.name = name
         self.destination = destination
@@ -39,6 +39,7 @@ class ListSelector: MenuItem {
     var current: Int = 0 {
         didSet {
             UserDefaults.standard.set(current, forKey: name)
+            destination? = options[current].value
         }
     }
     init(_ name: String, using destination: Int16?, options: [Option]){
@@ -54,6 +55,7 @@ class ListSelector: MenuItem {
             }
         }
         super.init(name, using: destination)
+        self.destination? = options[current].value
     }
     func currentOptionName() -> String {
         return self[current].name
@@ -64,18 +66,20 @@ class ListSelector: MenuItem {
 }
 
 class RangeSelector: MenuItem {
-    let min: Int
-    let max: Int
-    var current: Int {
+    let min: Int16
+    let max: Int16
+    var current: Int16 {
         didSet {
             UserDefaults.standard.set(current, forKey: name)
+            destination? = current
         }
     }
-    init(_ name: String, using destination: Int16?, min: Int, max: Int, defaultValue: Int){
+    init(_ name: String, using destination: Int16?, min: Int16, max: Int16, defaultValue: Int16){
         self.min = min
         self.max = max
-        current = UserDefaults.standard.object(forKey: name) as? Int ?? defaultValue
+        current = UserDefaults.standard.object(forKey: name) as? Int16 ?? defaultValue
         super.init(name, using: destination)
+        self.destination? = current
     }
 }
 
@@ -83,12 +87,14 @@ class Switch: MenuItem {
     var currentState: Bool {
         didSet {
             UserDefaults.standard.set(currentState, forKey: name)
+            destination? = currentState ? 1 : 0
         }
     }
     init(_ name: String, using destination: Int16?, _ defaultState: Bool){
         currentState = UserDefaults.standard.object(forKey: name) as? Bool ?? defaultState
         self.currentState = defaultState
         super.init(name, using: destination)
+        self.destination? = currentState ? 1 : 0
     }
 }
 
