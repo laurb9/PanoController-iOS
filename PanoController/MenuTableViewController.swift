@@ -41,12 +41,12 @@ class MenuTableViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return menus[section].entries.count
+        return (menus[section] as! Menu).count
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: UITableViewCell
-        let menuItem = menus[indexPath.section].entries[indexPath.row]
+        let menuItem = menus[indexPath]
 
         switch menuItem {
         case let listSelector as ListSelector:
@@ -116,7 +116,7 @@ class MenuTableViewController: UITableViewController {
     @IBAction func rangeUpdated(_ sender: UISlider) {
         let switchPosition = sender.convert(CGPoint.zero, to: tableView)
         if let indexPath = tableView.indexPathForRow(at: switchPosition),
-            let menuItem = menus[indexPath.section].entries[indexPath.row] as? RangeSelector {
+            let menuItem = menus[indexPath] as? RangeSelector {
             menuItem.current = Int(sender.value)
         }
     }
@@ -124,7 +124,7 @@ class MenuTableViewController: UITableViewController {
     @IBAction func toggleChanged(_ sender: UISwitch) {
         let switchPosition = sender.convert(CGPoint.zero, to: tableView)
         if let indexPath = tableView.indexPathForRow(at: switchPosition),
-            let menuItem = menus[indexPath.section].entries[indexPath.row] as? Switch {
+            let menuItem = menus[indexPath] as? Switch {
             menuItem.currentState = sender.isOn
         }
     }
@@ -146,7 +146,7 @@ class MenuTableViewController: UITableViewController {
             let destinationController = segue.destination as! OptionViewController
             let listSelector = sender as! SelectTableViewCell
             let indexPath = tableView.indexPath(for: listSelector)!
-            destinationController.menuItem = menus[indexPath.section].entries[indexPath.row] as? ListSelector
+            destinationController.menuItem = menus[indexPath] as? ListSelector
             destinationController.title = destinationController.menuItem?.name
         }
     }

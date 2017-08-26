@@ -19,7 +19,11 @@ extension Data {
     }
 }
 
-class Config: CustomStringConvertible {
+final class Config: CustomStringConvertible {
+    // This is a singleton
+    static let config = Config()
+    private init(){}
+
     var focal: Int16 = 35
     var shutter: Int16 = 100
     var pre_shutter: Int16 = 100
@@ -59,7 +63,11 @@ class Config: CustomStringConvertible {
     }
 }
 
-class Status: CustomStringConvertible {
+final class Status: CustomStringConvertible {
+    // This is a singleton
+    static let status = Status()
+    private init(){}
+
     var battery: Int16 = 0
     var motors_on: Int16 = 0
     var display_invert: Int16 = 0
@@ -70,7 +78,7 @@ class Status: CustomStringConvertible {
     var horiz_offset: Float32 = 0.0
     var vert_offset: Float32 = 0.0
 
-    func update(with data: Data) {
+    func unpack(_ data: Data) {
         var offset = 0
         (battery, offset) = data.readVal(start: offset)
         (motors_on, offset) = data.readVal(start: offset)

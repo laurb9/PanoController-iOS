@@ -24,19 +24,24 @@ class Option: NSObject {
 
 class MenuItem: NSObject {
     let name: String
-    init(_ name: String){
+    let destination: Int16?
+    init(_ name: String, using destination: Int16? = nil){
         self.name = name
+        self.destination = destination
     }
 }
 
 class ListSelector: MenuItem {
     let options: [Option]
+    var count: Int {
+        return options.count
+    }
     var current: Int = 0 {
         didSet {
             UserDefaults.standard.set(current, forKey: name)
         }
     }
-    init(_ name: String, options: [Option]){
+    init(_ name: String, using destination: Int16?, options: [Option]){
         self.options = options
         if let savedCurrent = UserDefaults.standard.object(forKey: name) as? Int {
             current = savedCurrent
@@ -48,10 +53,13 @@ class ListSelector: MenuItem {
                 }
             }
         }
-        super.init(name)
+        super.init(name, using: destination)
     }
     func currentOptionName() -> String {
-        return options[current].name
+        return self[current].name
+    }
+    subscript(index: Int) -> Option {
+        return options[index]
     }
 }
 
@@ -63,11 +71,11 @@ class RangeSelector: MenuItem {
             UserDefaults.standard.set(current, forKey: name)
         }
     }
-    init(_ name: String, min: Int, max: Int, defaultValue: Int){
+    init(_ name: String, using destination: Int16?, min: Int, max: Int, defaultValue: Int){
         self.min = min
         self.max = max
         current = UserDefaults.standard.object(forKey: name) as? Int ?? defaultValue
-        super.init(name)
+        super.init(name, using: destination)
     }
 }
 
@@ -77,29 +85,40 @@ class Switch: MenuItem {
             UserDefaults.standard.set(currentState, forKey: name)
         }
     }
-    init(_ name: String, _ defaultState: Bool){
+    init(_ name: String, using destination: Int16?, _ defaultState: Bool){
         currentState = UserDefaults.standard.object(forKey: name) as? Bool ?? defaultState
         self.currentState = defaultState
+        super.init(name, using: destination)
+    }
+}
+
+class Menu: MenuItem {
+    let entries: [MenuItem]
+    var count: Int {
+        return entries.count
+    }
+    init(_ name: String, entries: [MenuItem]){
+        self.entries = entries
         super.init(name)
     }
-}
 
-class Menu: NSObject {
-    let name: String
-    let entries: [MenuItem]
-    init(_ name: String, entries: [MenuItem]){
-        self.name = name
-        self.entries = entries
+    subscript(index: Int) -> MenuItem {
+        return entries[index]
+    }
+    subscript(index: IndexPath) -> MenuItem {
+        return (entries[index.section] as! Menu)[index.row]
     }
 }
 
-let menus = [
+let config = Config.config
+
+let menus = Menu("Configuration", entries: [
     Menu("🌄 Pano", entries: [
-        RangeSelector("Horizontal FOV", min: 5, max: 360, defaultValue: 120),
-        RangeSelector("Vertical FOV", min: 5, max: 180, defaultValue: 90),
+        RangeSelector("Horizontal FOV", using: config.horiz, min: 5, max: 360, defaultValue: 120),
+        RangeSelector("Vertical FOV", using: config.vert, min: 5, max: 180, defaultValue: 90),
         ]),
     Menu("📷️ Camera", entries: [
-        ListSelector("Focal Length", options: [
+        ListSelector("Focal Length", using: config.focal, options: [
             Option("12mm", 12),
             Option("14mm", 14),
             Option("16mm", 16),
@@ -117,7 +136,7 @@ let menus = [
             Option("500mm", 500),
             Option("600mm", 600),
             ]),
-        ListSelector("Shutter", options: [
+        ListSelector("Shutter", using: config.shutter, options: [
             Option("1/1000s", 1),
             Option("1/500s", 2),
             Option("1/250s", 4),
@@ -133,7 +152,7 @@ let menus = [
             Option("8s", 8000),
             Option("BULB", 0),
             ]),
-        ListSelector("Delay", options: [
+        ListSelector("Delay", using: config.pre_shutter, options: [
             Option("0.1s", 100, isDefault: true),
             Option("0.25s", 250),
             Option("0.5s", 500),
@@ -142,7 +161,7 @@ let menus = [
             Option("4s", 4000),
             Option("8s", 8000),
             ]),
-        ListSelector("Processing Wait", options: [
+        ListSelector("Processing Wait", using: config.post_wait, options: [
             Option("0.1s", 100, isDefault: true),
             Option("0.25s", 250),
             Option("0.5s", 500),
@@ -151,23 +170,23 @@ let menus = [
             Option("4s", 4000),
             Option("8s", 8000),
             ]),
-        ListSelector("Shutter Mode", options: [
+        ListSelector("Shutter Mode", using: config.long_pulse, options: [
             Option("Normal (Short)", 0, isDefault: true),
             Option("Cont Bracket (Long)", 1),
             ]),
-        ListSelector("Shots #", options: [
+        ListSelector("Shots #", using: config.shots, options: [
             Option("1", 1, isDefault: true),
             Option("2", 2),
             Option("3", 3),
             Option("4", 4),
             Option("5", 5),
             ]),
-        ListSelector("Aspect Ratio", options: [
+        ListSelector("Aspect Ratio", using: config.aspect, options: [
             Option("Portrait 2:3", 23),
             Option("Landscape 3:2", 32, isDefault: true),
             ]),
     ]),
     Menu("🛠 Advanced", entries: [
-        Switch("Motors", true),
+        Switch("Motors", using: config.motors_on, true),
         ]),
-]
+])

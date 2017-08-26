@@ -147,7 +147,7 @@ class DeviceTableViewController: UITableViewController, CBCentralManagerDelegate
             capabilities.object(forKey: CBAdvertisementDataIsConnectable) as? Bool ?? false,
             let dataServices = capabilities.object(forKey: CBAdvertisementDataServiceUUIDsKey) as? NSArray,
             // We are only looking for devices that have the PanoController Service
-            dataServices.contains(PanoPeripheral.PanoControllerService.UUID) {
+            dataServices.contains(PanoPeripheral.serviceUUID) {
 
             print("New peripheral \(peripheral) \(RSSI)")
             print(capabilities.description)
