@@ -9,6 +9,8 @@
 import Foundation
 import CoreBluetooth
 
+var panoPeripheral: PanoPeripheral?
+
 class PanoPeripheral : NSObject, CBPeripheralDelegate {
     static let status = Status.status
     static let config = Config.config
@@ -31,8 +33,8 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate {
     }
 
     func sendConfig(_ config: Config) {
-        print("sending \(PanoPeripheral.config.pack())")
         if let characteristic = configChar {
+            print("sending \(config.pack()) to \(characteristic)")
             peripheral?.writeValue(config.pack(), for: characteristic, type: .withoutResponse)
         }
     }
@@ -59,12 +61,12 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate {
             print("         ", thisCharacteristic)
             if thisCharacteristic.uuid == PanoPeripheral.statusCharUUID {
                 statusChar = thisCharacteristic
-                peripheral.setNotifyValue(true, for: thisCharacteristic)
-                peripheral.readValue(for: thisCharacteristic)
+                peripheral.setNotifyValue(true, for: statusChar!)
+                peripheral.readValue(for: statusChar!)
             }
             if thisCharacteristic.uuid == PanoPeripheral.configCharUUID {
                 configChar = thisCharacteristic
-                sendConfig(PanoPeripheral.config)
+                //sendConfig(PanoPeripheral.config)
             }
             if thisCharacteristic.uuid == PanoPeripheral.cmdCharUUID {
                 cmdChar = thisCharacteristic

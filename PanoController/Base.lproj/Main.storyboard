@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="o8c-XN-eua">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="hfY-Wo-URu">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -301,7 +301,7 @@
                             <outlet property="delegate" destination="FOU-fT-hSb" id="Z3e-ML-HjT"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Pano" id="njK-CA-BSe"/>
+                    <navigationItem key="navigationItem" title="Pano" id="kC6-2J-Tjq"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="mVF-nX-a9T" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -375,10 +375,14 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Connect" id="S3r-di-UVs"/>
+                    <connections>
+                        <outlet property="navTitle" destination="S3r-di-UVs" id="5SA-zk-hfk"/>
+                        <segue destination="o8c-XN-eua" kind="show" identifier="connected" id="Dtl-bT-dWi"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="uJN-nL-hoY" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1871" y="1728"/>
+            <point key="canvasLocation" x="-1234" y="946"/>
         </scene>
         <!--Connect-->
         <scene sceneID="nde-AJ-MRn">
@@ -395,7 +399,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="KwI-D7-3pW" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="918" y="1728"/>
+            <point key="canvasLocation" x="-1234" y="176"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="Xam-75-ASk">
@@ -408,7 +412,6 @@
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     </tabBar>
                     <connections>
-                        <segue destination="hfY-Wo-URu" kind="relationship" relationship="viewControllers" id="Ezk-Yo-nRe"/>
                         <segue destination="0jq-39-Kas" kind="relationship" relationship="viewControllers" id="WlS-zJ-rA9"/>
                         <segue destination="kxH-7d-jtZ" kind="relationship" relationship="viewControllers" id="EkB-UV-R6a"/>
                     </connections>

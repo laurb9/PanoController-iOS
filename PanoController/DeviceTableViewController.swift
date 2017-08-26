@@ -15,8 +15,8 @@ import UIKit
 class DeviceTableViewController: UITableViewController, CBCentralManagerDelegate {
     var bleManager: CBCentralManager!
     var peripheral: CBPeripheral?
-    var panoPeripheral: PanoPeripheral?
     var peripherals: [CBPeripheral] = []
+    @IBOutlet weak var navTitle: UINavigationItem!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,6 +28,10 @@ class DeviceTableViewController: UITableViewController, CBCentralManagerDelegate
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
 
         bleManager = CBCentralManager(delegate: self, queue: DispatchQueue.main)
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        navTitle.title = "Devices"
     }
 
     override func didReceiveMemoryWarning() {
@@ -116,15 +120,16 @@ class DeviceTableViewController: UITableViewController, CBCentralManagerDelegate
         }
     }
 
-    /*
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
+        if segue.identifier == "connected" {
+            navTitle.title = "Devices"
+        }
     }
-    */
 
     // MARK: - BLE 
 
@@ -160,19 +165,20 @@ class DeviceTableViewController: UITableViewController, CBCentralManagerDelegate
         print("didConnect \(peripheral.name!)")
         panoPeripheral = PanoPeripheral(peripheral)
         tableView.reloadData()
+        performSegue(withIdentifier: "connected", sender: self)
     }
 
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
         print("didFailToConnect: \(String(describing: error))")
         self.peripheral = nil
-        self.panoPeripheral = nil
+        panoPeripheral = nil
         central.scanForPeripherals(withServices: nil, options: nil)
     }
 
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
         print("didDisconnectPeripheral: \(peripheral.name!)")
         self.peripheral = nil
-        self.panoPeripheral = nil
+        panoPeripheral = nil
         central.scanForPeripherals(withServices: nil, options: nil)
         tableView.reloadData()
     }
