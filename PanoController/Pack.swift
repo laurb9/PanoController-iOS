@@ -9,6 +9,7 @@
 import Foundation
 
 // Add binary unpacking to Data
+
 extension Data {
     func readVal<T>(start: Int, length: Int) -> T {
         return self.subdata(in: start..<start+length).withUnsafeBytes { $0.pointee }
@@ -17,78 +18,111 @@ extension Data {
         let length = MemoryLayout<T>.size
         return (self.readVal(start: start, length: length), start+length)
     }
+    mutating func pack<T: Integer >(_ val: inout T){
+        self.append(UnsafeBufferPointer(start: &val, count: 1))
+    }
 }
 
-final class Config: CustomStringConvertible {
-    // This is a singleton
-    static let config = Config()
-    private init(){}
+// Add binary pack/unpack to Integer types
 
-    var focal: Int16 = 35
-    var shutter: Int16 = 100
-    var pre_shutter: Int16 = 100
-    var post_wait: Int16 = 500
-    var long_pulse: Int16 = 0
-    var aspect: Int16 = 1
-    var shots: Int16 = 1
-    var motors_enable: Int16 = 0
-    var motors_on: Int16 = 0
-    var display_invert: Int16 = 0
-    var horiz: Int16 = 360
-    var vert: Int16 = 160
-
-    func pack() -> Data {
+extension Integer {
+    func pack(into data: inout Data){
+        var tmp = self
+        data.append(UnsafeBufferPointer(start: &tmp, count: 1))
+    }
+    func packed() -> Data {
         var data = Data()
-        data.append(UnsafeBufferPointer(start: &focal, count: 1))
-        data.append(UnsafeBufferPointer(start: &shutter, count: 1))
-        data.append(UnsafeBufferPointer(start: &pre_shutter, count: 1))
-        data.append(UnsafeBufferPointer(start: &post_wait, count: 1))
-        data.append(UnsafeBufferPointer(start: &long_pulse, count: 1))
-        data.append(UnsafeBufferPointer(start: &aspect, count: 1))
-        data.append(UnsafeBufferPointer(start: &shots, count: 1))
-        data.append(UnsafeBufferPointer(start: &motors_enable, count: 1))
-        data.append(UnsafeBufferPointer(start: &motors_on, count: 1))
-        data.append(UnsafeBufferPointer(start: &display_invert, count: 1))
-        data.append(UnsafeBufferPointer(start: &horiz, count: 1))
-        data.append(UnsafeBufferPointer(start: &vert, count: 1))
+        self.pack(into: &data)
         return data
+    }
+}
+
+// Persistent Configuration dictionary
+
+protocol DictionaryObserver {
+    func didSet(_ config: Config, index: String, value: Int16)
+}
+
+class Config: NSObject {
+    var observer: DictionaryObserver?
+
+    // The list below contains all the keys allowed and a numeric identifier
+    static private let keyCodeMap: Dictionary<String, UInt8> = [
+        "focal": 41,
+        "shutter": 42,
+        "pre_shutter": 43,
+        "post_wait": 44,
+        "long_pulse": 45,
+        "aspect": 46,
+        "shots": 47,
+        "motors_enable": 48,
+        "motors_on": 49,
+        "display_invert": 50,
+        "horiz": 51,
+        "vert": 52
+    ]
+
+    // shadow dict with the actual KV pairs
+    var _config: Dictionary<String, Int16> = [:]
+
+    subscript(index: String) -> Int16 {
+        get {
+            return _config[index]!
+        }
+        set(newValue) {
+            if Config.keyCodeMap[index] != nil {
+                _config[index] = newValue
+                print("Config[\(index)]=\(newValue)")
+                observer?.didSet(self, index: index, value: newValue)
+            }
+        }
+    }
+
+    var keys: [String] {
+        var k: [String] = []
+        for key in _config.keys {
+            k.append(key)
+        }
+        return k
+    }
+
+    func serialize(index: String, into data: inout Data){
+        var c = Config.keyCodeMap[index]!
+        data.pack(&c)
+        var v = self[index]
+        data.pack(&v)
     }
 
     // MARK: -- CustomStringConvertible
 
-    var description: String {
+    override var description: String {
         get {
-            return "<Config focal=\(focal) shutter=\(shutter)>"
+            return "<Config focal=\(_config["focal"]!) shutter=\(_config["shutter"]!)>"
         }
     }
 }
 
-final class Status: CustomStringConvertible {
-    // This is a singleton
-    static let status = Status()
-    private init(){}
+class Status: NSObject {
 
-    var battery: Int16 = 0
-    var motors_on: Int16 = 0
-    var display_invert: Int16 = 0
-    var running: Int16 = 0
-    var paused: Int16 = 0
-    var position: Int16 = 0
-    var steady_delay_avg: Int16 = 0
     var horiz_offset: Float32 = 0.0
     var vert_offset: Float32 = 0.0
+    var battery: Int16 = 0
+    var position: Int16 = 0
+    var steady_delay_avg: Int16 = 0
+    var motors_on: Int8 = 0
+    var running: Int8 = 0
+    var paused: Int8 = 0
 
-    func unpack(_ data: Data) {
+    func deserialize(_ data: Data) {
         var offset = 0
-        (battery, offset) = data.readVal(start: offset)
-        (motors_on, offset) = data.readVal(start: offset)
-        (display_invert, offset) = data.readVal(start: offset)
-        (running, offset) = data.readVal(start: offset)
-        (paused, offset) = data.readVal(start: offset)
-        (position, offset) = data.readVal(start: offset)
-        (steady_delay_avg, offset) = data.readVal(start: offset)
         (horiz_offset, offset) = data.readVal(start: offset)
         (vert_offset, offset) = data.readVal(start: offset)
+        (battery, offset) = data.readVal(start: offset)
+        (position, offset) = data.readVal(start: offset)
+        (steady_delay_avg, offset) = data.readVal(start: offset)
+        (motors_on, offset) = data.readVal(start: offset)
+        (running, offset) = data.readVal(start: offset)
+        (paused, offset) = data.readVal(start: offset)
         if offset != data.count {
             print("Warning: Data size mismatch: read \(offset), received \(data.count)")
         }
@@ -96,7 +130,7 @@ final class Status: CustomStringConvertible {
 
     // MARK: -- CustomStringConvertible
 
-    var description: String {
+    override var description: String {
         get {
             return "<Status running=\(running) position=\(position) battery=\(battery)>"
         }

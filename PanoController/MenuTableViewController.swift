@@ -12,7 +12,10 @@
 import UIKit
 
 class MenuTableViewController: UITableViewController {
-  override func viewDidLoad() {
+    // FIXME: use global context, this seems unsafe. config should be a singleton probably
+    lazy var menus = getMenus(panoPeripheral!.config)
+
+    override func viewDidLoad() {
         super.viewDidLoad()
 
         tableView.estimatedRowHeight = 24.0
@@ -118,7 +121,6 @@ class MenuTableViewController: UITableViewController {
         if let indexPath = tableView.indexPathForRow(at: switchPosition),
             let menuItem = menus[indexPath] as? RangeSelector {
             menuItem.current = Int16(Int(sender.value))
-            panoPeripheral?.sendConfig(config)
         }
     }
 
@@ -127,7 +129,6 @@ class MenuTableViewController: UITableViewController {
         if let indexPath = tableView.indexPathForRow(at: switchPosition),
             let menuItem = menus[indexPath] as? Switch {
             menuItem.currentState = sender.isOn
-            panoPeripheral?.sendConfig(config)
         }
     }
 
@@ -139,8 +140,6 @@ class MenuTableViewController: UITableViewController {
         if let selectedIndexPath = tableView.indexPathForSelectedRow {
             tableView.reloadRows(at: [selectedIndexPath], with: .none)
         }
-        // should save
-        panoPeripheral?.sendConfig(config)
     }
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation

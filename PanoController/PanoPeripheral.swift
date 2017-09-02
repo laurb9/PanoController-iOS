@@ -11,9 +11,9 @@ import CoreBluetooth
 
 var panoPeripheral: PanoPeripheral?
 
-class PanoPeripheral : NSObject, CBPeripheralDelegate {
-    static let status = Status.status
-    static let config = Config.config
+class PanoPeripheral : NSObject, CBPeripheralDelegate, DictionaryObserver {
+    let status: Status
+    let config: Config
 
     static let serviceUUID = CBUUID(string: "2017")
     static let configCharUUID = CBUUID(string: "0001")
@@ -26,21 +26,36 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate {
     var peripheral: CBPeripheral?
 
     init(_ peripheral: CBPeripheral) {
+        self.status = Status()
+        self.config = Config()
         super.init()
+        config.observer = self
         self.peripheral = peripheral
         self.peripheral!.delegate = self
         peripheral.discoverServices(nil)
     }
 
-    func sendConfig(_ config: Config) {
+    // Mark: - Config DictionaryObserver
+
+    func didSet(_ config: Config, index: String, value: Int16) {
         if let characteristic = configChar {
-            print("sending \(config.pack()) to \(characteristic)")
-            peripheral?.writeValue(config.pack(), for: characteristic, type: .withoutResponse)
+            var data = Data()
+            config.serialize(index: index, into: &data)
+            print("sending \(data) for \(index) to \(characteristic)")
+            peripheral?.writeValue(data, for: characteristic, type: .withResponse)
         }
     }
 
+    // Mark: - Send/Receive operations
+
     func readStatus() -> Status {
-        return PanoPeripheral.status
+        return status
+    }
+
+    func sendConfig() {
+        for key in config.keys {
+            didSet(config, index: key, value: config[key])
+        }
     }
 
     // Mark: - CBPeripheralDelegate
@@ -66,7 +81,7 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate {
             }
             if thisCharacteristic.uuid == PanoPeripheral.configCharUUID {
                 configChar = thisCharacteristic
-                //sendConfig(PanoPeripheral.config)
+                sendConfig()
             }
             if thisCharacteristic.uuid == PanoPeripheral.cmdCharUUID {
                 cmdChar = thisCharacteristic
@@ -91,8 +106,8 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate {
 
         case PanoPeripheral.statusCharUUID:
             print(characteristic.value!)
-            PanoPeripheral.status.unpack(characteristic.value!)
-            print(PanoPeripheral.status)
+            status.deserialize(characteristic.value!)
+            print(status)
 
         default:
             print("Received update for unknown characteristic \(String(describing: characteristic))")
