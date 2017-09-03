@@ -123,6 +123,6 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate, DictionaryObserver {
     }
 
     func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
-        print("didWriteValueForCharacteristic \(String(describing: characteristic)) error=\(String(describing: error))")
+        //print("didWriteValueForCharacteristic \(String(describing: characteristic)) error=\(String(describing: error))")
     }
 }

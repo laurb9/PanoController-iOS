@@ -165,7 +165,7 @@ class DeviceTableViewController: UITableViewController, CBCentralManagerDelegate
         print("didConnect \(peripheral.name!)")
         panoPeripheral = PanoPeripheral(peripheral)
         tableView.reloadData()
-        performSegue(withIdentifier: "connected", sender: self)
+        performSegue(withIdentifier: "settings", sender: self)
     }
 
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
