@@ -127,7 +127,7 @@ class DeviceTableViewController: UITableViewController, CBCentralManagerDelegate
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
         if segue.identifier == "connected" {
-            navTitle.title = "Devices"
+            //navTitle.title = "Devices"
         }
     }
 

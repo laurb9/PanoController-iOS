@@ -48,18 +48,18 @@ class Config: NSObject {
 
     // The list below contains all the keys allowed and a numeric identifier
     static private let keyCodeMap: Dictionary<String, UInt8> = [
-        "focal": 41,
-        "shutter": 42,
-        "pre_shutter": 43,
-        "post_wait": 44,
-        "long_pulse": 45,
-        "aspect": 46,
-        "shots": 47,
-        "motors_enable": 48,
-        "motors_on": 49,
-        "display_invert": 50,
-        "horiz": 51,
-        "vert": 52
+        "focal": 0x41,
+        "shutter": 0x42,
+        "pre_shutter": 0x43,
+        "post_wait": 0x44,
+        "long_pulse": 0x45,
+        "aspect": 0x46,
+        "shots": 0x47,
+        "motors_enable": 0x48,
+        "motors_on": 0x49,
+        "display_invert": 0x4A,
+        "horiz": 0x4B,
+        "vert": 0x4C
     ]
 
     // shadow dict with the actual KV pairs

@@ -15,13 +15,14 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate, DictionaryObserver {
     let status: Status
     let config: Config
 
+    static let uartServiceUUID = CBUUID(string: "6E400001-B5A3-F393-E0A9-E50E24DCCA9E")
+    static let uartTxCharUUID = CBUUID(string: "6E400002-B5A3-F393-E0A9-E50E24DCCA9E")
+    static let uartRxCharUUID = CBUUID(string: "6E400003-B5A3-F393-E0A9-E50E24DCCA9E")
     static let serviceUUID = CBUUID(string: "2017")
-    static let configCharUUID = CBUUID(string: "0001")
     static let statusCharUUID = CBUUID(string: "0002")
-    static let cmdCharUUID = CBUUID(string: "0003")
     var statusChar: CBCharacteristic?
-    var configChar: CBCharacteristic?
-    var cmdChar: CBCharacteristic?
+    var uartTxChar: CBCharacteristic?
+    var uartRxChar: CBCharacteristic?
 
     var peripheral: CBPeripheral?
 
@@ -38,7 +39,7 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate, DictionaryObserver {
     // Mark: - Config DictionaryObserver
 
     func didSet(_ config: Config, index: String, value: Int16) {
-        if let characteristic = configChar {
+        if let characteristic = uartTxChar {
             var data = Data()
             config.serialize(index: index, into: &data)
             print("sending \(data) for \(index) to \(characteristic)")
@@ -74,17 +75,20 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate, DictionaryObserver {
         for characteristic in service.characteristics! {
             let thisCharacteristic = characteristic as CBCharacteristic
             print("         ", thisCharacteristic)
-            if thisCharacteristic.uuid == PanoPeripheral.statusCharUUID {
+            if service.uuid == PanoPeripheral.serviceUUID,
+                thisCharacteristic.uuid == PanoPeripheral.statusCharUUID {
                 statusChar = thisCharacteristic
                 peripheral.setNotifyValue(true, for: statusChar!)
                 peripheral.readValue(for: statusChar!)
             }
-            if thisCharacteristic.uuid == PanoPeripheral.configCharUUID {
-                configChar = thisCharacteristic
-                sendConfig()
-            }
-            if thisCharacteristic.uuid == PanoPeripheral.cmdCharUUID {
-                cmdChar = thisCharacteristic
+            if service.uuid == PanoPeripheral.uartServiceUUID {
+                if thisCharacteristic.uuid == PanoPeripheral.uartTxCharUUID {
+                    uartTxChar = thisCharacteristic
+                    sendConfig()
+                }
+                if thisCharacteristic.uuid == PanoPeripheral.uartRxCharUUID {
+                    uartRxChar = thisCharacteristic
+                }
             }
             //peripheral.discoverDescriptors(for: thisCharacteristic)
         }
@@ -99,15 +103,15 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate, DictionaryObserver {
     }
 
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
-        print("didUpdateValueFor \(String(describing: characteristic))")
+        //print("didUpdateValueFor \(String(describing: characteristic))")
         switch characteristic.uuid {
-        case PanoPeripheral.configCharUUID:
+        case PanoPeripheral.uartRxCharUUID:
             print(characteristic.value!)
 
         case PanoPeripheral.statusCharUUID:
-            print(characteristic.value!)
+            //print(characteristic.value!)
             status.deserialize(characteristic.value!)
-            print(status)
+            //print(status)
 
         default:
             print("Received update for unknown characteristic \(String(describing: characteristic))")
@@ -116,5 +120,9 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate, DictionaryObserver {
 
     func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
         print("didUpdateNotificationStateFor \(String(describing: characteristic))")
+    }
+
+    func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
+        print("didWriteValueForCharacteristic \(String(describing: characteristic)) error=\(String(describing: error))")
     }
 }
