@@ -86,11 +86,15 @@ class Config: NSObject {
         return k
     }
 
+    // keyCode + hex string representation
     func serialize(index: String, into data: inout Data){
         var c = Config.keyCodeMap[index]!
         data.pack(&c)
-        var v = self[index]
-        data.pack(&v)
+        for c in self[index].packed().reversed() {
+            var (low, high) = (0x30 + c & 0xf, 0x30 + (c & 0xf0) >> 4)
+            data.pack(&high)
+            data.pack(&low)
+        }
     }
 
     // MARK: -- CustomStringConvertible
