@@ -160,6 +160,7 @@ class DeviceTableViewController: UITableViewController, CBCentralManagerDelegate
         default:
             print("Bluetooth unavailable")
             peripherals.removeAll(keepingCapacity: false)
+            tableView.reloadData()
         }
     }
 
@@ -178,6 +179,14 @@ class DeviceTableViewController: UITableViewController, CBCentralManagerDelegate
             print(capabilities.description)
             peripherals.append(peripheral)
             tableView.reloadData()
+
+            // autoconnect to the last peripheral used if seen
+            if let lastPeripheralUUID = UserDefaults.standard.object(forKey: "lastPeripheralUUID") as? String,
+                peripheral.identifier.uuidString == lastPeripheralUUID {
+                self.peripheral = peripheral
+                bleManager.connect(peripheral, options: nil)
+                tableView.reloadRows(at: [IndexPath(row: peripherals.count-1, section: 0)], with: .none)
+            }
         }
     }
 
@@ -208,6 +217,7 @@ class DeviceTableViewController: UITableViewController, CBCentralManagerDelegate
     // MARK: - PanoPeripheralDelegate
 
     func panoPeripheralDidConnect(_ panoPeripheral: PanoPeripheral){
+        UserDefaults.standard.set(panoPeripheral.peripheral?.identifier.uuidString, forKey: "lastPeripheralUUID")
         if panoPeripheral.status.running == 1 {
             performSegue(withIdentifier: "pano", sender: self)
         } else {
