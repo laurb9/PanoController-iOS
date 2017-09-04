@@ -40,15 +40,17 @@ class PadViewController: UIViewController {
     */
 
     @IBAction func arrowLeft(_ sender: UIButton) {
-        panoPeripheral?.sendIncMove(forward: false)
+        panoPeripheral?.sendIncMove(.back)
     }
 
     @IBAction func arrowRight(_ sender: UIButton) {
-        panoPeripheral?.sendIncMove(forward: true)
+        panoPeripheral?.sendIncMove(.forward)
     }
 
     @IBAction func arrowUp(_ sender: UIButton) {
+        panoPeripheral?.sendIncMove(.up)
     }
     @IBAction func arrowDown(_ sender: UIButton) {
+        panoPeripheral?.sendIncMove(.down)
     }
 }

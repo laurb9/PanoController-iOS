@@ -103,9 +103,16 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate, ConfigDelegate {
             peripheral?.writeValue(data, for: characteristic, type: .withResponse)
         }
     }
-    func sendIncMove(forward direction: Bool){
+    enum Direction : UInt8 {
+        case forward = 0x3e
+        case back = 0x3c
+        case up = 0x5e
+        case down = 0x76
+    }
+    func sendIncMove(_ direction: Direction){
         if let characteristic = cmdChar ?? uartTxChar {
-            let data = Data(bytes: [0x69, direction ? 1 : 0])
+            var data = Data(bytes: [0x69])
+            data.append(direction.rawValue)
             print("sending IncMove(forward=\(direction)) (\(data)) to \(characteristic)")
             peripheral?.writeValue(data, for: characteristic, type: .withResponse)
         }
