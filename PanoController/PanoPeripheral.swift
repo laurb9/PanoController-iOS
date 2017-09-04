@@ -92,24 +92,50 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate, ConfigDelegate {
         }
     }
 
+    func sendFreeMove(horizontal: Float, vertical: Float) {
+        if let characteristic = cmdChar ?? uartTxChar {
+            let horiz = Int16(horizontal*100)
+            let vert = Int16(vertical*100)
+            var data = Data(bytes: [0x68])
+            Config.serialize(horiz, into: &data)
+            Config.serialize(vert, into: &data)
+            print("sending FreeMove(\(horiz), \(vert) (\(data)) to \(characteristic)")
+            peripheral?.writeValue(data, for: characteristic, type: .withResponse)
+        }
+    }
+    func sendIncMove(forward direction: Bool){
+        if let characteristic = cmdChar ?? uartTxChar {
+            let data = Data(bytes: [0x69, direction ? 1 : 0])
+            print("sending IncMove(forward=\(direction)) (\(data)) to \(characteristic)")
+            peripheral?.writeValue(data, for: characteristic, type: .withResponse)
+        }
+    }
     func send(command: String) {
         // WIP, placeholder code
         if let characteristic = cmdChar ?? uartTxChar {
-            var data: Data
+            var data: Data?
             switch command {
-            case "FreeMove":
-                let horiz: Int16 = 3412
-                let vert: Int16 = 4501
-                data = Data(bytes: [0x68])
-                Config.serialize(horiz, into: &data)
-                Config.serialize(vert, into: &data)
             case "Start":
                 data = Data(bytes: [0x61])
+            case "Cancel":
+                data = Data(bytes: [0x62])
+            case "Pause":
+                data = Data(bytes: [0x63])
+            case "Shutter":
+                data = Data(bytes: [0x64])
+            case "SetHome":
+                data = Data(bytes: [0x65])
+            case "GoHome":
+                data = Data(bytes: [0x66])
+            case "SendStatus":
+                data = Data(bytes: [0x67])
             default:
-                data = Data(bytes: [0xff])
+                print("Unknown command \(command)")
             }
-            print("sending command \(command) to \(characteristic)")
-            peripheral?.writeValue(data, for: characteristic, type: .withResponse)
+            if let data = data {
+                print("sending command \(command) (\(data)) to \(characteristic)")
+                peripheral?.writeValue(data, for: characteristic, type: .withResponse)
+            }
         }
     }
 
