@@ -12,11 +12,13 @@
 import CoreBluetooth
 import UIKit
 
-class DeviceTableViewController: UITableViewController, CBCentralManagerDelegate {
+class DeviceTableViewController: UITableViewController, CBCentralManagerDelegate, PanoPeripheralDelegate {
     var bleManager: CBCentralManager!
     var peripheral: CBPeripheral?
+    var panoPeripheral: PanoPeripheral?
     var peripherals: [CBPeripheral] = []
     @IBOutlet weak var navTitle: UINavigationItem!
+    @IBOutlet weak var settingsUIBarButtonItem: UIBarButtonItem!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,7 +33,9 @@ class DeviceTableViewController: UITableViewController, CBCentralManagerDelegate
     }
 
     override func viewWillAppear(_ animated: Bool) {
-        navTitle.title = "Devices"
+        print("DeviceTableViewControler: \(String(describing: panoPeripheral))")
+        panoPeripheral?.delegate = self
+        settingsUIBarButtonItem.isEnabled = panoPeripheral?.isReady ?? false
     }
 
     override func didReceiveMemoryWarning() {
@@ -54,14 +58,25 @@ class DeviceTableViewController: UITableViewController, CBCentralManagerDelegate
         let cell = tableView.dequeueReusableCell(withIdentifier: "BTPeripheral", for: indexPath) as! DeviceTableViewCell
         let thisPeripheral = peripherals[indexPath.row]
         cell.tag = indexPath.row
-        cell.nameView.text = thisPeripheral.name
         cell.connectingView.isHidden = true
+        cell.nameView.text = thisPeripheral.name
         if thisPeripheral.identifier == peripheral?.identifier {
+            cell.nameView.text! += "\n\(thisPeripheral.identifier)"
             if peripheral?.state == .connected {
                 cell.connectingView.stopAnimating()
                 cell.accessoryType = .checkmark
+                if panoPeripheral?.peripheral == nil {
+                    cell.nameView.text! += "\n(identifying)"
+                } else if panoPeripheral?.peripheral == thisPeripheral {
+                    if (panoPeripheral?.status.running == 1){
+                        cell.nameView.text! += "\nStatus: running, at photo \(panoPeripheral!.status.position+1), battery \(Float(abs(panoPeripheral!.status.battery))/1000.0)V"
+                    } else {
+                        cell.nameView.text! += "\nStatus: ready"
+                    }
+                }
             } else {
                 cell.connectingView.startAnimating()
+                cell.nameView.text! += "\n(connecting)"
             }
         } else {
             cell.accessoryType = .none
@@ -126,12 +141,17 @@ class DeviceTableViewController: UITableViewController, CBCentralManagerDelegate
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
-        if segue.identifier == "connected" {
-            //navTitle.title = "Devices"
+        if let menuTableViewController = segue.destination as? MenuTableViewController {
+            menuTableViewController.panoPeripheral = panoPeripheral
         }
     }
 
-    // MARK: - BLE 
+    @IBAction func unwindToDevices(sender: UIStoryboardSegue){
+        //if let _ = sender.source as? OptionViewController,
+        //}
+    }
+
+    // MARK: - CentralManagerDelegate
 
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
         switch central.state {
@@ -163,9 +183,8 @@ class DeviceTableViewController: UITableViewController, CBCentralManagerDelegate
 
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         print("didConnect \(peripheral.name!)")
-        panoPeripheral = PanoPeripheral(peripheral)
+        panoPeripheral = PanoPeripheral(peripheral, delegate: self)
         tableView.reloadData()
-        performSegue(withIdentifier: "settings", sender: self)
     }
 
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
@@ -178,8 +197,26 @@ class DeviceTableViewController: UITableViewController, CBCentralManagerDelegate
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
         print("didDisconnectPeripheral: \(peripheral.name!)")
         self.peripheral = nil
-        panoPeripheral = nil
+        if let p = panoPeripheral {
+            p.delegate?.panoPeripheralDidDisconnect(p)
+            panoPeripheral = nil
+        }
         central.scanForPeripherals(withServices: nil, options: nil)
         tableView.reloadData()
+    }
+
+    // MARK: - PanoPeripheralDelegate
+
+    func panoPeripheralDidConnect(_ panoPeripheral: PanoPeripheral){
+        if panoPeripheral.status.running == 1 {
+            performSegue(withIdentifier: "pano", sender: self)
+        } else {
+            performSegue(withIdentifier: "settings", sender: self)
+        }
+    }
+    func panoPeripheralDidDisconnect(_ panoPeripheral: PanoPeripheral){
+    }
+    func panoPeripheral(_ panoPeripheral: PanoPeripheral, didReceiveStatus status: Status){
+        tableView.reloadData() // too lazy
     }
 }

@@ -19,6 +19,7 @@
 		D39570671F32F34F00388325 /* ToggleTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D39570661F32F34F00388325 /* ToggleTableViewCell.swift */; };
 		D39570691F32F38500388325 /* SelectTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D39570681F32F38500388325 /* SelectTableViewCell.swift */; };
 		D395706B1F32FE4600388325 /* RangeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D395706A1F32FE4600388325 /* RangeTableViewCell.swift */; };
+		D3B133681F5BCBC00006D968 /* PanoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3B133671F5BCBC00006D968 /* PanoViewController.swift */; };
 		D3B17B741F4018B800A7F6F1 /* PanoPeripheral.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3B17B731F4018B800A7F6F1 /* PanoPeripheral.swift */; };
 		D3B17B761F4A6CCF00A7F6F1 /* Pack.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3B17B751F4A6CCF00A7F6F1 /* Pack.swift */; };
 		D3ED73CA1F377904000C8A97 /* DeviceTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3ED73C91F377904000C8A97 /* DeviceTableViewController.swift */; };
@@ -53,6 +54,7 @@
 		D39570661F32F34F00388325 /* ToggleTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToggleTableViewCell.swift; sourceTree = "<group>"; };
 		D39570681F32F38500388325 /* SelectTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectTableViewCell.swift; sourceTree = "<group>"; };
 		D395706A1F32FE4600388325 /* RangeTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RangeTableViewCell.swift; sourceTree = "<group>"; };
+		D3B133671F5BCBC00006D968 /* PanoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PanoViewController.swift; sourceTree = "<group>"; };
 		D3B17B731F4018B800A7F6F1 /* PanoPeripheral.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PanoPeripheral.swift; sourceTree = "<group>"; };
 		D3B17B751F4A6CCF00A7F6F1 /* Pack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pack.swift; sourceTree = "<group>"; };
 		D3ED73C91F377904000C8A97 /* DeviceTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = DeviceTableViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -117,6 +119,7 @@
 				D3ED73CB1F377953000C8A97 /* DeviceTableViewCell.swift */,
 				D3B17B731F4018B800A7F6F1 /* PanoPeripheral.swift */,
 				D3B17B751F4A6CCF00A7F6F1 /* Pack.swift */,
+				D3B133671F5BCBC00006D968 /* PanoViewController.swift */,
 			);
 			path = PanoController;
 			sourceTree = "<group>";
@@ -252,6 +255,7 @@
 				D3B17B741F4018B800A7F6F1 /* PanoPeripheral.swift in Sources */,
 				D39570611F2EC51700388325 /* Menu.swift in Sources */,
 				D3B17B761F4A6CCF00A7F6F1 /* Pack.swift in Sources */,
+				D3B133681F5BCBC00006D968 /* PanoViewController.swift in Sources */,
 				D395705F1F2EC10A00388325 /* MenuTableViewController.swift in Sources */,
 				D3ED73CA1F377904000C8A97 /* DeviceTableViewController.swift in Sources */,
 				D39570691F32F38500388325 /* SelectTableViewCell.swift in Sources */,

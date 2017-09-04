@@ -11,9 +11,12 @@
 
 import UIKit
 
-class MenuTableViewController: UITableViewController {
+class MenuTableViewController: UITableViewController, PanoPeripheralDelegate {
     // FIXME: use global context, this seems unsafe. config should be a singleton probably
-    lazy var menus = getMenus(panoPeripheral!.config)
+    var panoPeripheral: PanoPeripheral?
+    var menus: Menu?
+    @IBOutlet weak var deviceUILabel: UILabel!
+    @IBOutlet weak var panoUIBarButtonItem: UIBarButtonItem!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,6 +29,17 @@ class MenuTableViewController: UITableViewController {
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
+        panoPeripheral?.delegate = self
+        if let p = panoPeripheral {
+            menus = getMenus(p.config)
+        }
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        print("MenuTableViewControler: \(String(describing: panoPeripheral))")
+        panoPeripheral?.delegate = self
+        self.deviceUILabel.text = panoPeripheral?.name
+        panoUIBarButtonItem.isEnabled = panoPeripheral?.isReady ?? false
     }
 
     override func didReceiveMemoryWarning() {
@@ -36,20 +50,20 @@ class MenuTableViewController: UITableViewController {
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return menus.count
+        return menus!.count
     }
 
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return menus[section].name
+        return menus![section].name
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return (menus[section] as! Menu).count
+        return (menus![section] as! Menu).count
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: UITableViewCell
-        let menuItem = menus[indexPath]
+        let menuItem = menus![indexPath]
 
         switch menuItem {
         case let listSelector as ListSelector:
@@ -119,7 +133,7 @@ class MenuTableViewController: UITableViewController {
     @IBAction func rangeUpdated(_ sender: UISlider) {
         let switchPosition = sender.convert(CGPoint.zero, to: tableView)
         if let indexPath = tableView.indexPathForRow(at: switchPosition),
-            let menuItem = menus[indexPath] as? RangeSelector {
+            let menuItem = menus![indexPath] as? RangeSelector {
             menuItem.current = Int16(Int(sender.value))
         }
     }
@@ -127,7 +141,7 @@ class MenuTableViewController: UITableViewController {
     @IBAction func toggleChanged(_ sender: UISwitch) {
         let switchPosition = sender.convert(CGPoint.zero, to: tableView)
         if let indexPath = tableView.indexPathForRow(at: switchPosition),
-            let menuItem = menus[indexPath] as? Switch {
+            let menuItem = menus![indexPath] as? Switch {
             menuItem.currentState = sender.isOn
         }
     }
@@ -144,12 +158,29 @@ class MenuTableViewController: UITableViewController {
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "showOptions" {
-            let destinationController = segue.destination as! OptionViewController
-            let listSelector = sender as! SelectTableViewCell
-            let indexPath = tableView.indexPath(for: listSelector)!
-            destinationController.menuItem = menus[indexPath] as? ListSelector
+        if let destinationController = segue.destination as? OptionViewController,
+            let listSelector = sender as? SelectTableViewCell,
+            let indexPath = tableView.indexPath(for: listSelector) {
+            destinationController.menuItem = menus![indexPath] as? ListSelector
             destinationController.title = destinationController.menuItem?.name
+        } else if let panoViewController = segue.destination as? PanoViewController {
+            panoViewController.panoPeripheral = panoPeripheral
+        }
+    }
+
+    // MARK: - PanoPeripheralDelegate
+
+    func panoPeripheralDidConnect(_ panoPeripheral: PanoPeripheral){
+        self.deviceUILabel.text = panoPeripheral.name
+        panoUIBarButtonItem.isEnabled = true
+    }
+    func panoPeripheralDidDisconnect(_ panoPeripheral: PanoPeripheral){
+        panoUIBarButtonItem.isEnabled = false
+        performSegue(withIdentifier: "devices", sender: self)
+    }
+    func panoPeripheral(_ panoPeripheral: PanoPeripheral, didReceiveStatus status: Status){
+        if panoPeripheral.status.running == 1 {
+            performSegue(withIdentifier: "pano", sender: self)
         }
     }
 }

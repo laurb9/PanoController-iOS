@@ -21,6 +21,9 @@ extension Data {
     mutating func pack<T: Integer >(_ val: inout T){
         self.append(UnsafeBufferPointer(start: &val, count: 1))
     }
+    mutating func pack<T: FloatingPoint >(_ val: inout T){
+        self.append(UnsafeBufferPointer(start: &val, count: 1))
+    }
 }
 
 // Add binary pack/unpack to Integer types
@@ -37,14 +40,14 @@ extension Integer {
     }
 }
 
-// Persistent Configuration dictionary
-
-protocol DictionaryObserver {
-    func didSet(_ config: Config, index: String, value: Int16)
+protocol ConfigDelegate {
+    func config(_ config: Config, didSetIndex index: String, withValue value: Int16)
 }
 
+// Persistent Configuration dictionary
+
 class Config: NSObject {
-    var observer: DictionaryObserver?
+    var delegate: ConfigDelegate?
 
     // The list below contains all the keys allowed and a numeric identifier
     static private let keyCodeMap: Dictionary<String, UInt8> = [
@@ -73,7 +76,7 @@ class Config: NSObject {
             if Config.keyCodeMap[index] != nil {
                 _config[index] = newValue
                 print("Config[\(index)]=\(newValue)")
-                observer?.didSet(self, index: index, value: newValue)
+                delegate?.config(self, didSetIndex: index, withValue: newValue)
             }
         }
     }
@@ -86,11 +89,14 @@ class Config: NSObject {
         return k
     }
 
-    // keyCode + hex string representation
+    // keyCode + printable string representation
     func serialize(index: String, into data: inout Data){
         var c = Config.keyCodeMap[index]!
         data.pack(&c)
-        for c in self[index].packed().reversed() {
+        Config.serialize(self[index], into: &data)
+    }
+    static func serialize(_ value: Int16, into data: inout Data){
+        for c in value.packed().reversed() {
             var (low, high) = (0x30 + c & 0xf, 0x30 + (c & 0xf0) >> 4)
             data.pack(&high)
             data.pack(&low)

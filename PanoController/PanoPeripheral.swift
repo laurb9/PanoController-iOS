@@ -9,20 +9,32 @@
 import Foundation
 import CoreBluetooth
 
-var panoPeripheral: PanoPeripheral?
+protocol PanoPeripheralDelegate {
+    func panoPeripheralDidConnect(_ panoPeripheral: PanoPeripheral)
+    func panoPeripheralDidDisconnect(_ panoPeripheral: PanoPeripheral)
+    func panoPeripheral(_ panoPeripheral: PanoPeripheral, didReceiveStatus status: Status)
+}
 
-class PanoPeripheral : NSObject, CBPeripheralDelegate, DictionaryObserver {
+class PanoPeripheral : NSObject, CBPeripheralDelegate, ConfigDelegate {
     let status: Status
     let config: Config
+    var delegate: PanoPeripheralDelegate?
+    var connected: Bool = false
+    var isReady: Bool {
+        checkIfReady()
+        return connected && peripheral?.state == .connected
+    }
 
     static let uartServiceUUID = CBUUID(string: "6E400001-B5A3-F393-E0A9-E50E24DCCA9E")
     static let uartTxCharUUID = CBUUID(string: "6E400002-B5A3-F393-E0A9-E50E24DCCA9E")
     static let uartRxCharUUID = CBUUID(string: "6E400003-B5A3-F393-E0A9-E50E24DCCA9E")
     static let serviceUUID = CBUUID(string: "2017")
     static let statusCharUUID = CBUUID(string: "0002")
+    static let cmdCharUUID = CBUUID(string: "0003")
     var statusChar: CBCharacteristic?
     var uartTxChar: CBCharacteristic?
     var uartRxChar: CBCharacteristic?
+    var cmdChar: CBCharacteristic?
 
     var peripheral: CBPeripheral?
 
@@ -30,15 +42,36 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate, DictionaryObserver {
         self.status = Status()
         self.config = Config()
         super.init()
-        config.observer = self
+        config.delegate = self
         self.peripheral = peripheral
         self.peripheral!.delegate = self
         peripheral.discoverServices(nil)
     }
 
-    // Mark: - Config DictionaryObserver
+    convenience init(_ peripheral: CBPeripheral, delegate: PanoPeripheralDelegate) {
+        self.init(peripheral)
+        self.delegate = delegate
+    }
 
-    func didSet(_ config: Config, index: String, value: Int16) {
+    var name: String {
+        return peripheral?.name ?? ""
+    }
+
+    func checkIfReady() {
+        if !connected &&
+            statusChar != nil &&
+            uartTxChar != nil &&
+            uartRxChar != nil &&
+            cmdChar != nil {
+            connected = true
+            sendConfig()
+            delegate?.panoPeripheralDidConnect(self)
+        }
+    }
+
+    // Mark: - ConfigDelegate
+
+    func config(_ config: Config, didSetIndex index: String, withValue value: Int16) {
         if let characteristic = uartTxChar {
             var data = Data()
             config.serialize(index: index, into: &data)
@@ -47,7 +80,7 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate, DictionaryObserver {
         }
     }
 
-    // Mark: - Send/Receive operations
+    // Mark: - Pano Device Control Send/Receive operations
 
     func readStatus() -> Status {
         return status
@@ -55,7 +88,28 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate, DictionaryObserver {
 
     func sendConfig() {
         for key in config.keys {
-            didSet(config, index: key, value: config[key])
+            config(config, didSetIndex: key, withValue: config[key])
+        }
+    }
+
+    func send(command: String) {
+        // WIP, placeholder code
+        if let characteristic = cmdChar ?? uartTxChar {
+            var data: Data
+            switch command {
+            case "FreeMove":
+                let horiz: Int16 = 3412
+                let vert: Int16 = 4501
+                data = Data(bytes: [0x68])
+                Config.serialize(horiz, into: &data)
+                Config.serialize(vert, into: &data)
+            case "Start":
+                data = Data(bytes: [0x61])
+            default:
+                data = Data(bytes: [0xff])
+            }
+            print("sending command \(command) to \(characteristic)")
+            peripheral?.writeValue(data, for: characteristic, type: .withResponse)
         }
     }
 
@@ -75,16 +129,19 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate, DictionaryObserver {
         for characteristic in service.characteristics! {
             let thisCharacteristic = characteristic as CBCharacteristic
             print("         ", thisCharacteristic)
-            if service.uuid == PanoPeripheral.serviceUUID,
-                thisCharacteristic.uuid == PanoPeripheral.statusCharUUID {
-                statusChar = thisCharacteristic
-                peripheral.setNotifyValue(true, for: statusChar!)
-                peripheral.readValue(for: statusChar!)
+            if service.uuid == PanoPeripheral.serviceUUID {
+                if thisCharacteristic.uuid == PanoPeripheral.statusCharUUID {
+                    statusChar = thisCharacteristic
+                    peripheral.setNotifyValue(true, for: statusChar!)
+                    peripheral.readValue(for: statusChar!)
+                }
+                if thisCharacteristic.uuid == PanoPeripheral.cmdCharUUID {
+                    cmdChar = thisCharacteristic
+                }
             }
             if service.uuid == PanoPeripheral.uartServiceUUID {
                 if thisCharacteristic.uuid == PanoPeripheral.uartTxCharUUID {
                     uartTxChar = thisCharacteristic
-                    sendConfig()
                 }
                 if thisCharacteristic.uuid == PanoPeripheral.uartRxCharUUID {
                     uartRxChar = thisCharacteristic
@@ -92,6 +149,7 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate, DictionaryObserver {
             }
             //peripheral.discoverDescriptors(for: thisCharacteristic)
         }
+        checkIfReady()
     }
 
     func peripheral(_ peripheral: CBPeripheral, didDiscoverDescriptorsFor characteristic: CBCharacteristic, error: Error?) {
@@ -106,12 +164,11 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate, DictionaryObserver {
         //print("didUpdateValueFor \(String(describing: characteristic))")
         switch characteristic.uuid {
         case PanoPeripheral.uartRxCharUUID:
-            print(characteristic.value!)
+            print(characteristic.value!) // not expecting to receive anything, but maybe leave code for future
 
         case PanoPeripheral.statusCharUUID:
-            //print(characteristic.value!)
             status.deserialize(characteristic.value!)
-            //print(status)
+            delegate?.panoPeripheral(self, didReceiveStatus: status)
 
         default:
             print("Received update for unknown characteristic \(String(describing: characteristic))")
@@ -124,5 +181,13 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate, DictionaryObserver {
 
     func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
         //print("didWriteValueForCharacteristic \(String(describing: characteristic)) error=\(String(describing: error))")
+    }
+
+    // MARK: -- CustomStringConvertible
+
+    override var description: String {
+        get {
+            return "<PanoController connected=\(connected) ready=\(isReady) name=\(name)>"
+        }
     }
 }
