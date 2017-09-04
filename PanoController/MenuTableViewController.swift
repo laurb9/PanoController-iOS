@@ -176,10 +176,12 @@ class MenuTableViewController: UITableViewController, PanoPeripheralDelegate {
     }
     func panoPeripheralDidDisconnect(_ panoPeripheral: PanoPeripheral){
         panoUIBarButtonItem.isEnabled = false
+        panoPeripheral.delegate = nil
         performSegue(withIdentifier: "devices", sender: self)
     }
     func panoPeripheral(_ panoPeripheral: PanoPeripheral, didReceiveStatus status: Status){
         if panoPeripheral.status.running == 1 {
+            panoPeripheral.delegate = nil
             performSegue(withIdentifier: "pano", sender: self)
         }
     }

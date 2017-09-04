@@ -217,6 +217,7 @@ class DeviceTableViewController: UITableViewController, CBCentralManagerDelegate
     // MARK: - PanoPeripheralDelegate
 
     func panoPeripheralDidConnect(_ panoPeripheral: PanoPeripheral){
+        panoPeripheral.delegate = nil  // avoid triggering the segue multiple times
         UserDefaults.standard.set(panoPeripheral.peripheral?.identifier.uuidString, forKey: "lastPeripheralUUID")
         if panoPeripheral.status.running == 1 {
             performSegue(withIdentifier: "pano", sender: self)

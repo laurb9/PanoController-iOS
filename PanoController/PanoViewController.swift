@@ -63,15 +63,21 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
         panoPeripheral?.send(command: "Cancel")
     }
 
-    /*
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+        if let padViewController = segue.destination as? PadViewController {
+            padViewController.panoPeripheral = panoPeripheral
+        }
     }
-    */
+
+    @IBAction func unwindToStatus(sender: UIStoryboardSegue){
+        //if let _ = sender.source as? OptionViewController,
+        //}
+        panoPeripheral?.delegate = self
+        panoPeripheral?.send(command: "Start")
+    }
 
     // MARK: - PanoPeripheralDelegate
 
@@ -113,6 +119,11 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
         }
         for button: UIButton in [startUIButton, pauseUIButton, cancelUIButton]{
             button.alpha = button.isEnabled ? 1.0 : 0.1
+        }
+        if status.running == 1 && status.paused == 1 {
+            print("Paused -> Pad")
+            panoPeripheral.delegate = nil
+            performSegue(withIdentifier: "pad", sender: self)
         }
     }
 }

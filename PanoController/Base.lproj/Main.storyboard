@@ -6,6 +6,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -226,6 +227,9 @@
                                 </state>
                                 <connections>
                                     <action selector="pausePano:" destination="2jN-p5-Trb" eventType="touchUpInside" id="bbb-LJ-H4g"/>
+                                    <segue destination="C9X-fn-VsN" kind="popoverPresentation" identifier="pad" animates="NO" popoverAnchorView="z1Y-KL-nD4" id="FvP-WO-do5">
+                                        <popoverArrowDirection key="popoverArrowDirection"/>
+                                    </segue>
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Battery" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xjr-BE-pU2">
@@ -475,6 +479,122 @@
                 <exit id="YqV-aj-gQN" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="1292" y="978.26086956521749"/>
+        </scene>
+        <!--Pad View Controller-->
+        <scene sceneID="e7j-5p-9Xq">
+            <objects>
+                <viewController id="C9X-fn-VsN" customClass="PadViewController" customModule="PanoController" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="MHc-wm-zQ8"/>
+                        <viewControllerLayoutGuide type="bottom" id="1fy-r7-KXq"/>
+                    </layoutGuides>
+                    <view key="view" opaque="NO" contentMode="scaleAspectFit" id="CUz-9M-hop">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HlY-um-fkI">
+                                <rect key="frame" x="16" y="221" width="89" height="89"/>
+                                <accessibility key="accessibilityConfiguration">
+                                    <accessibilityTraits key="traits" button="YES" staticText="YES"/>
+                                </accessibility>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="HlY-um-fkI" secondAttribute="height" multiplier="1:1" id="jPn-ar-SXQ"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="64"/>
+                                <state key="normal" title="⬅️">
+                                    <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
+                                </state>
+                                <connections>
+                                    <action selector="arrowLeft:" destination="C9X-fn-VsN" eventType="touchUpInside" id="aeM-Jt-Lhd"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7aE-fu-OH7">
+                                <rect key="frame" x="290" y="221" width="89" height="89"/>
+                                <accessibility key="accessibilityConfiguration">
+                                    <accessibilityTraits key="traits" button="YES" staticText="YES"/>
+                                </accessibility>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="7aE-fu-OH7" secondAttribute="height" multiplier="1:1" id="a2R-0L-Olm"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="64"/>
+                                <state key="normal" title="➡️">
+                                    <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
+                                </state>
+                                <connections>
+                                    <action selector="arrowRight:" destination="C9X-fn-VsN" eventType="touchUpInside" id="CAj-x9-FQN"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nOv-WP-9YD">
+                                <rect key="frame" x="153" y="84" width="89" height="89"/>
+                                <accessibility key="accessibilityConfiguration">
+                                    <accessibilityTraits key="traits" button="YES" staticText="YES"/>
+                                </accessibility>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="nOv-WP-9YD" secondAttribute="height" multiplier="1:1" id="HYT-HA-3c3"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="64"/>
+                                <state key="normal" title="⬆️">
+                                    <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
+                                </state>
+                                <connections>
+                                    <action selector="arrowUp:" destination="C9X-fn-VsN" eventType="touchUpInside" id="Iph-gZ-Tel"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bQv-As-47w">
+                                <rect key="frame" x="153" y="358" width="89" height="89"/>
+                                <accessibility key="accessibilityConfiguration">
+                                    <accessibilityTraits key="traits" button="YES" staticText="YES"/>
+                                </accessibility>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="bQv-As-47w" secondAttribute="height" multiplier="1:1" id="PVf-ek-dmH"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="64"/>
+                                <state key="normal" title="⬇️">
+                                    <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
+                                </state>
+                                <connections>
+                                    <action selector="arrowDown:" destination="C9X-fn-VsN" eventType="touchUpInside" id="2rA-eA-xRb"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Nfh-vH-mkG">
+                                <rect key="frame" x="153" y="221" width="89" height="89"/>
+                                <accessibility key="accessibilityConfiguration">
+                                    <accessibilityTraits key="traits" button="YES" staticText="YES"/>
+                                </accessibility>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="Nfh-vH-mkG" secondAttribute="height" multiplier="1:1" id="bS6-Wr-2MF"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="64"/>
+                                <state key="normal" title="🆗">
+                                    <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
+                                </state>
+                                <connections>
+                                    <segue destination="Be2-5s-09A" kind="unwind" unwindAction="unwindToStatusWithSender:" id="P2z-gU-9aW"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="bQv-As-47w" firstAttribute="width" secondItem="nOv-WP-9YD" secondAttribute="width" id="3wd-rI-R1a"/>
+                            <constraint firstItem="7aE-fu-OH7" firstAttribute="leading" secondItem="Nfh-vH-mkG" secondAttribute="trailing" constant="48" id="4ZJ-9K-jwi"/>
+                            <constraint firstItem="Nfh-vH-mkG" firstAttribute="leading" secondItem="HlY-um-fkI" secondAttribute="trailing" constant="48" id="625-ka-Mik"/>
+                            <constraint firstItem="Nfh-vH-mkG" firstAttribute="top" secondItem="nOv-WP-9YD" secondAttribute="bottom" constant="48" id="AAA-3C-I3t"/>
+                            <constraint firstItem="Nfh-vH-mkG" firstAttribute="width" secondItem="nOv-WP-9YD" secondAttribute="width" id="CPD-Lt-ABR"/>
+                            <constraint firstItem="bQv-As-47w" firstAttribute="centerX" secondItem="nOv-WP-9YD" secondAttribute="centerX" id="Lmy-Rf-p0v"/>
+                            <constraint firstItem="HlY-um-fkI" firstAttribute="leading" secondItem="CUz-9M-hop" secondAttribute="leadingMargin" id="Mmv-4p-Rpw"/>
+                            <constraint firstItem="HlY-um-fkI" firstAttribute="width" secondItem="nOv-WP-9YD" secondAttribute="width" id="NS4-GM-F3d"/>
+                            <constraint firstItem="7aE-fu-OH7" firstAttribute="centerY" secondItem="HlY-um-fkI" secondAttribute="centerY" id="Q27-v6-XDu"/>
+                            <constraint firstItem="Nfh-vH-mkG" firstAttribute="centerX" secondItem="nOv-WP-9YD" secondAttribute="centerX" id="S5u-19-Spm"/>
+                            <constraint firstItem="bQv-As-47w" firstAttribute="top" secondItem="Nfh-vH-mkG" secondAttribute="bottom" constant="48" id="Uw5-Sn-x5s"/>
+                            <constraint firstItem="Nfh-vH-mkG" firstAttribute="centerY" secondItem="HlY-um-fkI" secondAttribute="centerY" id="oEW-uE-MvQ"/>
+                            <constraint firstItem="nOv-WP-9YD" firstAttribute="top" secondItem="MHc-wm-zQ8" secondAttribute="bottom" constant="64" id="wSZ-Eg-Pol"/>
+                            <constraint firstItem="7aE-fu-OH7" firstAttribute="width" secondItem="nOv-WP-9YD" secondAttribute="width" id="xRq-mT-hfC"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="hsc-AI-AfH" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <exit id="Be2-5s-09A" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="2213.5999999999999" y="978.26086956521749"/>
         </scene>
         <!--Option View Controller-->
         <scene sceneID="LxV-k7-CZT">
