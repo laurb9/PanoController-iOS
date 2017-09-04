@@ -54,13 +54,13 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
     }
     
     @IBAction func startPano(_ sender: UIButton) {
-        panoPeripheral?.send(command: "Start")
+        panoPeripheral?.send(command: .start)
     }
     @IBAction func pausePano(_ sender: UIButton) {
-        panoPeripheral?.send(command: "Pause")
+        panoPeripheral?.send(command: .pause)
     }
     @IBAction func cancelPano(_ sender: UIButton) {
-        panoPeripheral?.send(command: "Cancel")
+        panoPeripheral?.send(command: .cancel)
     }
 
     // MARK: - Navigation
@@ -76,7 +76,7 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
         //if let _ = sender.source as? OptionViewController,
         //}
         panoPeripheral?.delegate = self
-        panoPeripheral?.send(command: "Start")
+        panoPeripheral?.send(command: .start)
     }
 
     // MARK: - PanoPeripheralDelegate

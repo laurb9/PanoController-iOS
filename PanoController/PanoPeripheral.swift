@@ -92,16 +92,16 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate, ConfigDelegate {
         }
     }
 
-    func sendFreeMove(horizontal: Float, vertical: Float) {
-        if let characteristic = cmdChar ?? uartTxChar {
-            let horiz = Int16(horizontal*100)
-            let vert = Int16(vertical*100)
-            var data = Data(bytes: [0x68])
-            Config.serialize(horiz, into: &data)
-            Config.serialize(vert, into: &data)
-            print("sending FreeMove(\(horiz), \(vert) (\(data)) to \(characteristic)")
-            peripheral?.writeValue(data, for: characteristic, type: .withResponse)
-        }
+    enum Command : UInt8 {
+        case start = 0x61
+        case cancel = 0x62
+        case pause = 0x63
+        case shutter = 0x64
+        case setHome = 0x65
+        case goHome = 0x66
+        case sendStatus = 0x67
+        case freeMove = 0x68
+        case incMove = 0x69
     }
     enum Direction : UInt8 {
         case forward = 0x3e
@@ -109,40 +109,31 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate, ConfigDelegate {
         case up = 0x5e
         case down = 0x76
     }
-    func sendIncMove(_ direction: Direction){
+    func sendFreeMove(horizontal: Float, vertical: Float) {
         if let characteristic = cmdChar ?? uartTxChar {
-            var data = Data(bytes: [0x69])
-            data.append(direction.rawValue)
-            print("sending IncMove(forward=\(direction)) (\(data)) to \(characteristic)")
+            let horiz = Int16(horizontal*100)
+            let vert = Int16(vertical*100)
+            var data = Data(bytes: [Command.freeMove.rawValue])
+            Config.serialize(horiz, into: &data)
+            Config.serialize(vert, into: &data)
+            print("sending FreeMove(\(horiz), \(vert) (\(data)) to \(characteristic)")
             peripheral?.writeValue(data, for: characteristic, type: .withResponse)
         }
     }
-    func send(command: String) {
+    func sendIncMove(_ direction: Direction){
+        if let characteristic = cmdChar ?? uartTxChar {
+            var data = Data(bytes: [Command.incMove.rawValue])
+            data.append(direction.rawValue)
+            print("sending IncMove(\(direction)) (\(data)) to \(characteristic)")
+            peripheral?.writeValue(data, for: characteristic, type: .withResponse)
+        }
+    }
+    func send(command: Command) {
         // WIP, placeholder code
         if let characteristic = cmdChar ?? uartTxChar {
-            var data: Data?
-            switch command {
-            case "Start":
-                data = Data(bytes: [0x61])
-            case "Cancel":
-                data = Data(bytes: [0x62])
-            case "Pause":
-                data = Data(bytes: [0x63])
-            case "Shutter":
-                data = Data(bytes: [0x64])
-            case "SetHome":
-                data = Data(bytes: [0x65])
-            case "GoHome":
-                data = Data(bytes: [0x66])
-            case "SendStatus":
-                data = Data(bytes: [0x67])
-            default:
-                print("Unknown command \(command)")
-            }
-            if let data = data {
-                print("sending command \(command) (\(data)) to \(characteristic)")
-                peripheral?.writeValue(data, for: characteristic, type: .withResponse)
-            }
+            let data = Data(bytes: [command.rawValue])
+            print("sending command \(command) (\(data)) to \(characteristic)")
+            peripheral?.writeValue(data, for: characteristic, type: .withResponse)
         }
     }
 
