@@ -31,7 +31,6 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
         // Do any additional setup after loading the view.
     }
 
@@ -111,6 +110,9 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
             startUIButton.isEnabled = true
             pauseUIButton.isEnabled = false
             cancelUIButton.isEnabled = false
+        }
+        for button: UIButton in [startUIButton, pauseUIButton, cancelUIButton]{
+            button.alpha = button.isEnabled ? 1.0 : 0.1
         }
     }
 }
