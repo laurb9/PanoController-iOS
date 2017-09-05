@@ -90,10 +90,10 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
         batteryUILabel.text = String(format: "%.1f V", arguments:[Float(abs(status.battery))/1000.0])
         motorsUILabel.text = status.motors_on == 1 ? "ON" : "off"
         if status.running == 1 {
-            positionUILabel.text = "\(status.position+1)"
+            positionUILabel.text = "\(status.position+1) of \(status.rows*status.cols)"
             steadyDelayUILabel.text = String(format: "%.1f s", arguments:[Float(status.steady_delay_avg)/1000.0])
-            horizOffsetUILabel.text = String(format: "%.1fº", arguments:[status.horiz_offset])
-            vertOffsetUILabel.text = String(format: "%.1fº", arguments:[status.vert_offset])
+            horizOffsetUILabel.text = "\(status.horiz_offset)"
+            vertOffsetUILabel.text = "\(status.vert_offset)"
         } else {
             positionUILabel.text = "N/A"
             steadyDelayUILabel.text = "N/A"

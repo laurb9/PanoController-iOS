@@ -114,8 +114,10 @@ class Config: NSObject {
 
 class Status: NSObject {
 
-    var horiz_offset: Float32 = 0.0
-    var vert_offset: Float32 = 0.0
+    var horiz_offset: Int16 = 0
+    var vert_offset: Int16 = 0
+    var rows: Int16 = 0
+    var cols: Int16 = 0
     var battery: Int16 = 0
     var position: Int16 = 0
     var steady_delay_avg: Int16 = 0
@@ -127,6 +129,8 @@ class Status: NSObject {
         var offset = 0
         (horiz_offset, offset) = data.readVal(start: offset)
         (vert_offset, offset) = data.readVal(start: offset)
+        (rows, offset) = data.readVal(start: offset)
+        (cols, offset) = data.readVal(start: offset)
         (battery, offset) = data.readVal(start: offset)
         (position, offset) = data.readVal(start: offset)
         (steady_delay_avg, offset) = data.readVal(start: offset)
