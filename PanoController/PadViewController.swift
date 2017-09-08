@@ -50,6 +50,7 @@ class PadViewController: UIViewController {
     @IBAction func arrowUp(_ sender: UIButton) {
         panoPeripheral?.sendIncMove(.up)
     }
+    
     @IBAction func arrowDown(_ sender: UIButton) {
         panoPeripheral?.sendIncMove(.down)
     }

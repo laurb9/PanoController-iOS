@@ -26,6 +26,7 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
     @IBOutlet weak var shutterUILabel: UILabel!
     @IBOutlet weak var horizUILabel: UILabel!
     @IBOutlet weak var vertUILabel: UILabel!
+    @IBOutlet weak var padUIView: UIView!
 
     var panoPeripheral: PanoPeripheral?
 
@@ -121,9 +122,14 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
             button.alpha = button.isEnabled ? 1.0 : 0.1
         }
         if status.running == 1 && status.paused == 1 {
-            print("Paused -> Pad")
-            panoPeripheral.delegate = nil
-            performSegue(withIdentifier: "pad", sender: self)
+            if padUIView.alpha < 1 {
+                padUIView.isHidden = false
+                UIView.animate(withDuration: 0.5, animations: {self.padUIView.alpha = 1})
+            }
+        } else {
+            if padUIView.alpha > 0 {
+                UIView.animate(withDuration: 0.5, animations: {self.padUIView.alpha = 0}, completion: { (_: Bool) in self.padUIView.isHidden = true})
+            }
         }
     }
 }
