@@ -8,8 +8,15 @@
 
 import UIKit
 
+enum MoveMode {
+    case freeMove
+    case gridMove
+}
+
 class PadViewController: UIViewController {
     var panoPeripheral: PanoPeripheral?
+    var moveMode: MoveMode = .freeMove
+    var timer: Timer?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,19 +46,59 @@ class PadViewController: UIViewController {
     }
     */
 
-    @IBAction func arrowLeft(_ sender: UIButton) {
-        panoPeripheral?.sendIncMove(.back)
+    func repeatFreeMove(horizontal: Float, vertical: Float) {
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) {
+            (timer: Timer) in
+            self.panoPeripheral?.sendFreeMove(horizontal: horizontal, vertical: vertical)
+        }
+    }
+    func stopFreeMove(){
+        timer?.invalidate()
     }
 
-    @IBAction func arrowRight(_ sender: UIButton) {
-        panoPeripheral?.sendIncMove(.forward)
+    @IBAction func leftArrowBegin(_ sender: UIButton) {
+        switch moveMode {
+        case .gridMove: panoPeripheral?.sendIncMove(.back)
+        case .freeMove: repeatFreeMove(horizontal: -1, vertical: 0)
+        }
+    }
+    @IBAction func leftArrowEnd(_ sender: UIButton) {
+        stopFreeMove()
     }
 
-    @IBAction func arrowUp(_ sender: UIButton) {
-        panoPeripheral?.sendIncMove(.up)
+    @IBAction func rightArrowBegin(_ sender: UIButton) {
+        switch moveMode {
+        case .gridMove: panoPeripheral?.sendIncMove(.forward)
+        case .freeMove: repeatFreeMove(horizontal: 1, vertical: 0)
+        }
     }
-    
-    @IBAction func arrowDown(_ sender: UIButton) {
-        panoPeripheral?.sendIncMove(.down)
+    @IBAction func rightArrowEnd(_ sender: UIButton) {
+        stopFreeMove()
+    }
+
+    @IBAction func upArrowBegin(_ sender: UIButton) {
+        switch moveMode {
+        case .gridMove: panoPeripheral?.sendIncMove(.up)
+        case .freeMove: repeatFreeMove(horizontal: 0, vertical: 1)
+        }
+    }
+    @IBAction func upArrowEnd(_ sender: UIButton) {
+        stopFreeMove()
+    }
+
+    @IBAction func downArrowBegin(_ sender: UIButton) {
+        switch moveMode {
+        case .gridMove: panoPeripheral?.sendIncMove(.down)
+        case .freeMove: repeatFreeMove(horizontal: 0, vertical: -1)
+        }
+    }
+    @IBAction func downArrowEnd(_ sender: UIButton) {
+        stopFreeMove()
+    }
+
+    @IBAction func ok(_ sender: UIButton) {
+        print("ok pressed")
+        stopFreeMove()
     }
 }

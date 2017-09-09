@@ -27,7 +27,7 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
     @IBOutlet weak var horizUILabel: UILabel!
     @IBOutlet weak var vertUILabel: UILabel!
     @IBOutlet weak var padUIView: UIView!
-
+    var padViewController: PadViewController!
     var panoPeripheral: PanoPeripheral?
 
     override func viewDidLoad() {
@@ -55,13 +55,36 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
     }
     
     @IBAction func startPano(_ sender: UIButton) {
-        panoPeripheral?.send(command: .start)
+        showPadView(for: .freeMove)
     }
     @IBAction func pausePano(_ sender: UIButton) {
         panoPeripheral?.send(command: .pause)
+        showPadView(for: .gridMove)
     }
     @IBAction func cancelPano(_ sender: UIButton) {
         panoPeripheral?.send(command: .cancel)
+        hidePadView()
+    }
+
+    func showPadView(for moveMode: MoveMode) {
+        padViewController.moveMode = moveMode
+        if padUIView.isHidden {
+            print("showing PadView in \(moveMode)")
+            padUIView.isHidden = false
+            UIView.animate(withDuration: 0.5, animations: { self.padUIView.alpha = 1 })
+        }
+    }
+
+    func hidePadView() {
+        if !padUIView.isHidden {
+            print("dismiss PadView")
+            UIView.animate(withDuration: 0.5, animations: {
+                self.padUIView.alpha = 0
+            }, completion: {
+                (_: Bool) in
+                    self.padUIView.isHidden = true
+            })
+        }
     }
 
     // MARK: - Navigation
@@ -69,15 +92,15 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if let padViewController = segue.destination as? PadViewController {
+            self.padViewController = padViewController
             padViewController.panoPeripheral = panoPeripheral
         }
     }
 
     @IBAction func unwindToStatus(sender: UIStoryboardSegue){
-        //if let _ = sender.source as? OptionViewController,
-        //}
-        panoPeripheral?.delegate = self
+        print("unwindToStatus from \(sender)")
         panoPeripheral?.send(command: .start)
+        hidePadView()
     }
 
     // MARK: - PanoPeripheralDelegate
@@ -122,14 +145,7 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
             button.alpha = button.isEnabled ? 1.0 : 0.1
         }
         if status.running == 1 && status.paused == 1 {
-            if padUIView.alpha < 1 {
-                padUIView.isHidden = false
-                UIView.animate(withDuration: 0.5, animations: {self.padUIView.alpha = 1})
-            }
-        } else {
-            if padUIView.alpha > 0 {
-                UIView.animate(withDuration: 0.5, animations: {self.padUIView.alpha = 0}, completion: { (_: Bool) in self.padUIView.isHidden = true})
-            }
+            showPadView(for: .gridMove)
         }
     }
 }

@@ -385,7 +385,7 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <containerView opaque="NO" contentMode="bottom" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XyI-NJ-VDr">
+                            <containerView hidden="YES" opaque="NO" contentMode="bottom" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XyI-NJ-VDr">
                                 <rect key="frame" x="0.0" y="358" width="375" height="310"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <connections>
@@ -510,7 +510,8 @@
                                     <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
                                 </state>
                                 <connections>
-                                    <action selector="arrowLeft:" destination="C9X-fn-VsN" eventType="touchUpInside" id="aeM-Jt-Lhd"/>
+                                    <action selector="leftArrowBegin:" destination="C9X-fn-VsN" eventType="touchDown" id="nkq-6H-TKr"/>
+                                    <action selector="leftArrowEnd:" destination="C9X-fn-VsN" eventType="touchUpInside" id="xvZ-us-ZCz"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7aE-fu-OH7">
@@ -526,7 +527,8 @@
                                     <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
                                 </state>
                                 <connections>
-                                    <action selector="arrowRight:" destination="C9X-fn-VsN" eventType="touchUpInside" id="CAj-x9-FQN"/>
+                                    <action selector="rightArrowBegin:" destination="C9X-fn-VsN" eventType="touchDown" id="BJW-oI-VK8"/>
+                                    <action selector="rightArrowEnd:" destination="C9X-fn-VsN" eventType="touchUpInside" id="4wF-7b-3xg"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nOv-WP-9YD">
@@ -542,7 +544,8 @@
                                     <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
                                 </state>
                                 <connections>
-                                    <action selector="arrowUp:" destination="C9X-fn-VsN" eventType="touchUpInside" id="Iph-gZ-Tel"/>
+                                    <action selector="upArrowBegin:" destination="C9X-fn-VsN" eventType="touchDown" id="2nI-qW-qOo"/>
+                                    <action selector="upArrowEnd:" destination="C9X-fn-VsN" eventType="touchUpInside" id="l2O-yV-CkZ"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bQv-As-47w">
@@ -558,7 +561,8 @@
                                     <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
                                 </state>
                                 <connections>
-                                    <action selector="arrowDown:" destination="C9X-fn-VsN" eventType="touchUpInside" id="2rA-eA-xRb"/>
+                                    <action selector="downArrowBegin:" destination="C9X-fn-VsN" eventType="touchDown" id="oJH-Oh-7cH"/>
+                                    <action selector="downArrowEnd:" destination="C9X-fn-VsN" eventType="touchUpInside" id="LvY-ix-FIJ"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Nfh-vH-mkG">
@@ -574,7 +578,8 @@
                                     <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
                                 </state>
                                 <connections>
-                                    <segue destination="Be2-5s-09A" kind="unwind" unwindAction="unwindToStatusWithSender:" id="P2z-gU-9aW"/>
+                                    <action selector="ok:" destination="C9X-fn-VsN" eventType="touchDown" id="njT-14-2BX"/>
+                                    <segue destination="Be2-5s-09A" kind="unwind" unwindAction="unwindToStatusWithSender:" id="V8k-CA-HnS"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -621,7 +626,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="scaleToFill" text="Title" lineBreakMode="wordWrap" numberOfLines="0" minimumScaleFactor="0.5" adjustsFontForContentSizeCategory="YES" id="aeE-vM-k2P">
-                                            <rect key="frame" x="16" y="0.0" width="344" height="43.5"/>
+                                            <rect key="frame" x="15" y="0.0" width="345" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <gestureRecognizers/>
                                             <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
