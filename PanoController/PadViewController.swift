@@ -101,4 +101,8 @@ class PadViewController: UIViewController {
         print("ok pressed")
         stopFreeMove()
     }
+
+    @IBAction func shutter(_ sender: UIButton) {
+        panoPeripheral?.send(command: .shutter)
+    }
 }
