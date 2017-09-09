@@ -14,6 +14,10 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
     @IBOutlet weak var panoUIProgressView: UIProgressView!
     @IBOutlet weak var batteryUILabel: UILabel!
     @IBOutlet weak var positionUILabel: UILabel!
+    @IBOutlet weak var rowsUILabel: UILabel!
+    @IBOutlet weak var colsUILabel: UILabel!
+    @IBOutlet weak var currentRowUILabel: UILabel!
+    @IBOutlet weak var currentColUILabel: UILabel!
     @IBOutlet weak var statusUILabel: UILabel!
     @IBOutlet weak var motorsUILabel: UILabel!
     @IBOutlet weak var steadyDelayUILabel: UILabel!
@@ -39,11 +43,11 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
         print("PanoViewControler: \(String(describing: panoPeripheral))")
         if let panoPeripheral = panoPeripheral {
             panoPeripheral.delegate = self
-            self.nameUILabel.text = panoPeripheral.name
-            self.lensUILabel.text = "\(panoPeripheral.config["focal"])mm"
+            self.lensUILabel.text = "\(panoPeripheral.config["focal"])"
             self.shutterUILabel.text = "\(panoPeripheral.config["shutter"])ms"
             self.horizUILabel.text = "\(panoPeripheral.config["horiz"])"
             self.vertUILabel.text = "\(panoPeripheral.config["vert"])"
+            self.nameUILabel.text = panoPeripheral.name
             self.identifierUILabel.text = panoPeripheral.peripheral?.identifier.uuidString
             //self.signalUILabel.text = ...
         }
@@ -127,16 +131,16 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
         batteryUILabel.text = String(format: "%.1fV", arguments:[Float(abs(status.battery))/1000.0])
         motorsUILabel.text = status.motors_on == 1 ? "⚡️" : "💤"
         if status.running == 1 {
+            rowsUILabel.text = "\(status.rows)"
+            colsUILabel.text = "\(status.cols)"
+            currentRowUILabel.text = "\(status.position / status.cols + 1)"
+            currentColUILabel.text = "\(status.position % status.cols + 1)"
             positionUILabel.text = "#\(status.position+1) of \(status.rows*status.cols)"
+            panoUIProgressView.progress = Float(status.position+1) / Float(status.rows*status.cols)
             steadyDelayUILabel.text = String(format: "%.1fs", arguments:[Float(status.steady_delay_avg)/1000.0])
-            horizOffsetUILabel.text = "\(status.horiz_offset)"
-            vertOffsetUILabel.text = "\(status.vert_offset)"
-        } else {
-            positionUILabel.text = ""
-            steadyDelayUILabel.text = ""
-            horizOffsetUILabel.text = ""
-            vertOffsetUILabel.text = ""
         }
+        horizOffsetUILabel.text = "\(status.horiz_offset)"
+        vertOffsetUILabel.text = "\(panoPeripheral.config["vert"] + status.vert_offset)"
         switch (status.running, status.paused) {
         case (1, 0):
             statusUILabel.text = "▶️"
