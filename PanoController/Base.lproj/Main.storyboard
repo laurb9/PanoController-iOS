@@ -132,7 +132,7 @@
                                                         <constraint firstAttribute="width" constant="150" id="dVm-kT-fJB"/>
                                                     </constraints>
                                                     <connections>
-                                                        <action selector="rangeUpdated:" destination="vAV-NJ-qQT" eventType="valueChanged" id="pbX-I5-JG0"/>
+                                                        <action selector="rangeUpdated:" destination="vAV-NJ-qQT" eventType="touchUpInside" id="Eib-KJ-wBV"/>
                                                         <action selector="touchUpInside:" destination="w9V-8T-70p" eventType="touchUpInside" id="ceV-HU-lTi"/>
                                                         <action selector="valueChanged:" destination="w9V-8T-70p" eventType="valueChanged" id="qPf-ZG-3aw"/>
                                                     </connections>
@@ -621,7 +621,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="scaleToFill" text="Title" lineBreakMode="wordWrap" numberOfLines="0" minimumScaleFactor="0.5" adjustsFontForContentSizeCategory="YES" id="aeE-vM-k2P">
-                                            <rect key="frame" x="15" y="0.0" width="345" height="43.5"/>
+                                            <rect key="frame" x="16" y="0.0" width="344" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <gestureRecognizers/>
                                             <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>

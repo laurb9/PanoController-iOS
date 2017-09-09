@@ -30,8 +30,8 @@ class RangeTableViewCell: UITableViewCell {
 
     // Make the slider use MULTIPLEs
     @IBAction func valueChanged(_ sender: Any) {
-        let value = lroundf(slider.value) / MULTIPLE * MULTIPLE
-        valueLabel?.text = "\(value)º"
+        slider.value = roundf((slider.value) / Float(MULTIPLE)) * Float(MULTIPLE)
+        valueLabel?.text = "\(Int(slider.value))º"
     }
     @IBAction func touchUpInside(_ sender: Any) {
         return valueChanged(sender)
