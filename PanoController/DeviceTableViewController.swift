@@ -59,9 +59,8 @@ class DeviceTableViewController: UITableViewController, CBCentralManagerDelegate
         let thisPeripheral = peripherals[indexPath.row]
         cell.tag = indexPath.row
         cell.connectingView.isHidden = true
-        cell.nameView.text = thisPeripheral.name
+        cell.nameView.text = "\(thisPeripheral.name ?? "(no name)")\n\(thisPeripheral.identifier)"
         if thisPeripheral.identifier == peripheral?.identifier {
-            cell.nameView.text! += "\n\(thisPeripheral.identifier)"
             if peripheral?.state == .connected {
                 cell.connectingView.stopAnimating()
                 cell.accessoryType = .checkmark

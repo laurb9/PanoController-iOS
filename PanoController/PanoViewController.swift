@@ -11,6 +11,7 @@ import UIKit
 class PanoViewController: UIViewController, PanoPeripheralDelegate {
     @IBOutlet weak var nameUILabel: UILabel!
     @IBOutlet weak var identifierUILabel: UILabel!
+    @IBOutlet weak var panoUIProgressView: UIProgressView!
     @IBOutlet weak var batteryUILabel: UILabel!
     @IBOutlet weak var positionUILabel: UILabel!
     @IBOutlet weak var statusUILabel: UILabel!
@@ -41,8 +42,8 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
             self.nameUILabel.text = panoPeripheral.name
             self.lensUILabel.text = "\(panoPeripheral.config["focal"])mm"
             self.shutterUILabel.text = "\(panoPeripheral.config["shutter"])ms"
-            self.horizUILabel.text = "\(panoPeripheral.config["horiz"])º"
-            self.vertUILabel.text = "\(panoPeripheral.config["vert"])º"
+            self.horizUILabel.text = "\(panoPeripheral.config["horiz"])"
+            self.vertUILabel.text = "\(panoPeripheral.config["vert"])"
             self.identifierUILabel.text = panoPeripheral.peripheral?.identifier.uuidString
             //self.signalUILabel.text = ...
         }
@@ -123,28 +124,28 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
         performSegue(withIdentifier: "devices", sender: self)
     }
     func panoPeripheral(_ panoPeripheral: PanoPeripheral, didReceiveStatus status: Status){
-        batteryUILabel.text = String(format: "%.1f V", arguments:[Float(abs(status.battery))/1000.0])
-        motorsUILabel.text = status.motors_on == 1 ? "ON" : "off"
+        batteryUILabel.text = String(format: "%.1fV", arguments:[Float(abs(status.battery))/1000.0])
+        motorsUILabel.text = status.motors_on == 1 ? "⚡️" : "💤"
         if status.running == 1 {
-            positionUILabel.text = "\(status.position+1) of \(status.rows*status.cols)"
-            steadyDelayUILabel.text = String(format: "%.1f s", arguments:[Float(status.steady_delay_avg)/1000.0])
+            positionUILabel.text = "#\(status.position+1) of \(status.rows*status.cols)"
+            steadyDelayUILabel.text = String(format: "%.1fs", arguments:[Float(status.steady_delay_avg)/1000.0])
             horizOffsetUILabel.text = "\(status.horiz_offset)"
             vertOffsetUILabel.text = "\(status.vert_offset)"
         } else {
-            positionUILabel.text = "N/A"
-            steadyDelayUILabel.text = "N/A"
-            horizOffsetUILabel.text = "0"
-            vertOffsetUILabel.text = "0"
+            positionUILabel.text = ""
+            steadyDelayUILabel.text = ""
+            horizOffsetUILabel.text = ""
+            vertOffsetUILabel.text = ""
         }
         switch (status.running, status.paused) {
         case (1, 0):
-            statusUILabel.text = " RUNNING"
+            statusUILabel.text = "▶️"
             setButtonStates(start: false, pause: true, cancel: true)
         case (1, 1):
-            statusUILabel.text = "PAUSED"
+            statusUILabel.text = "⏸"
             setButtonStates(start: false, pause: false, cancel: true)
         default:
-            statusUILabel.text = "ready"
+            statusUILabel.text = "⏹"
         }
         if status.running == 1 && status.paused == 1 {
             showPadView(for: .gridMove)
