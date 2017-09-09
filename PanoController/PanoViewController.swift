@@ -31,8 +31,7 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
     var panoPeripheral: PanoPeripheral?
 
     override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view.
+        super.viewDidLoad()        // Do any additional setup after loading the view.
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -47,6 +46,16 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
             self.identifierUILabel.text = panoPeripheral.peripheral?.identifier.uuidString
             //self.signalUILabel.text = ...
         }
+        setButtonStates(start: true, pause: false, cancel: false)
+    }
+
+    func setButtonStates(start: Bool, pause: Bool, cancel: Bool){
+        startUIButton.isEnabled = start
+        pauseUIButton.isEnabled = pause
+        cancelUIButton.isEnabled = cancel
+        for button: UIButton in [startUIButton, pauseUIButton, cancelUIButton]{
+            button.alpha = button.isEnabled ? 1.0 : 0.1
+        }
     }
 
     override func didReceiveMemoryWarning() {
@@ -56,14 +65,17 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
     
     @IBAction func startPano(_ sender: UIButton) {
         showPadView(for: .freeMove)
+        setButtonStates(start: false, pause: false, cancel: true)
     }
     @IBAction func pausePano(_ sender: UIButton) {
         panoPeripheral?.send(command: .pause)
         showPadView(for: .gridMove)
+        setButtonStates(start: false, pause: false, cancel: true)
     }
     @IBAction func cancelPano(_ sender: UIButton) {
         panoPeripheral?.send(command: .cancel)
         hidePadView()
+        setButtonStates(start: true, pause: false, cancel: false)
     }
 
     func showPadView(for moveMode: MoveMode) {
@@ -127,22 +139,12 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
         switch (status.running, status.paused) {
         case (1, 0):
             statusUILabel.text = " RUNNING"
-            startUIButton.isEnabled = false
-            pauseUIButton.isEnabled = true
-            cancelUIButton.isEnabled = true
+            setButtonStates(start: false, pause: true, cancel: true)
         case (1, 1):
             statusUILabel.text = "PAUSED"
-            startUIButton.isEnabled = true
-            pauseUIButton.isEnabled = false
-            cancelUIButton.isEnabled = true
+            setButtonStates(start: false, pause: false, cancel: true)
         default:
             statusUILabel.text = "ready"
-            startUIButton.isEnabled = true
-            pauseUIButton.isEnabled = false
-            cancelUIButton.isEnabled = false
-        }
-        for button: UIButton in [startUIButton, pauseUIButton, cancelUIButton]{
-            button.alpha = button.isEnabled ? 1.0 : 0.1
         }
         if status.running == 1 && status.paused == 1 {
             showPadView(for: .gridMove)
