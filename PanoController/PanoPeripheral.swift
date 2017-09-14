@@ -29,11 +29,13 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate, ConfigDelegate {
     static let uartTxCharUUID = CBUUID(string: "6E400002-B5A3-F393-E0A9-E50E24DCCA9E")
     static let uartRxCharUUID = CBUUID(string: "6E400003-B5A3-F393-E0A9-E50E24DCCA9E")
     static let serviceUUID = CBUUID(string: "2017")
+    static let configCharUUID = CBUUID(string: "0001")
     static let statusCharUUID = CBUUID(string: "0002")
     static let cmdCharUUID = CBUUID(string: "0003")
     var statusChar: CBCharacteristic?
     var uartTxChar: CBCharacteristic?
     var uartRxChar: CBCharacteristic?
+    var configChar: CBCharacteristic?
     var cmdChar: CBCharacteristic?
 
     var peripheral: CBPeripheral?
@@ -60,9 +62,8 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate, ConfigDelegate {
     func checkIfReady() {
         if !connected &&
             statusChar != nil &&
-            uartTxChar != nil &&
             uartRxChar != nil &&
-            cmdChar != nil {
+            (uartTxChar != nil || cmdChar != nil) {
             connected = true
             sendConfig()
             delegate?.panoPeripheralDidConnect(self)
@@ -72,7 +73,7 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate, ConfigDelegate {
     // Mark: - ConfigDelegate
 
     func config(_ config: Config, didSetIndex index: String, withValue value: Int16) {
-        if let characteristic = uartTxChar {
+        if let characteristic = uartTxChar ?? configChar {
             var data = Data()
             config.serialize(index: index, into: &data)
             print("sending \(data) for \(index) to \(characteristic)")
@@ -110,7 +111,7 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate, ConfigDelegate {
         case down = 0x76
     }
     func sendFreeMove(horizontal: Float, vertical: Float) {
-        if let characteristic = cmdChar ?? uartTxChar {
+        if let characteristic =  uartTxChar ?? cmdChar {
             let horiz = Int16(horizontal*100)
             let vert = Int16(vertical*100)
             var data = Data(bytes: [Command.freeMove.rawValue])
@@ -121,7 +122,7 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate, ConfigDelegate {
         }
     }
     func sendIncMove(_ direction: Direction){
-        if let characteristic = cmdChar ?? uartTxChar {
+        if let characteristic = uartTxChar ?? cmdChar {
             var data = Data(bytes: [Command.incMove.rawValue])
             data.append(direction.rawValue)
             print("sending IncMove(\(direction)) (\(data)) to \(characteristic)")
@@ -129,8 +130,7 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate, ConfigDelegate {
         }
     }
     func send(command: Command) {
-        // WIP, placeholder code
-        if let characteristic = cmdChar ?? uartTxChar {
+        if let characteristic = uartTxChar ?? cmdChar {
             let data = Data(bytes: [command.rawValue])
             print("sending command \(command) (\(data)) to \(characteristic)")
             peripheral?.writeValue(data, for: characteristic, type: .withResponse)
@@ -161,6 +161,9 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate, ConfigDelegate {
                 }
                 if thisCharacteristic.uuid == PanoPeripheral.cmdCharUUID {
                     cmdChar = thisCharacteristic
+                }
+                if thisCharacteristic.uuid == PanoPeripheral.configCharUUID {
+                    configChar = thisCharacteristic
                 }
             }
             if service.uuid == PanoPeripheral.uartServiceUUID {

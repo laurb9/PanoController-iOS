@@ -96,11 +96,7 @@ class Config: NSObject {
         Config.serialize(self[index], into: &data)
     }
     static func serialize(_ value: Int16, into data: inout Data){
-        for c in value.packed().reversed() {
-            var (low, high) = (0x30 + c & 0xf, 0x30 + (c & 0xf0) >> 4)
-            data.pack(&high)
-            data.pack(&low)
-        }
+        data.append(value.packed())
     }
 
     // MARK: -- CustomStringConvertible
