@@ -5,9 +5,7 @@ iOS PanoController App 1.0
 
 Fully functional configuration and control of the Pano Platform over BLE.
 
-<img src="media/connect-screen.png" width="200" alt="Connect Screen">
-<img src="media/config-screen.png" width="200" alt="Config Screen">
-<img src="media/pano-screen.png" width="200" alt="Panorama Status and Pause Commands">
+<img src="media/connect-screen.png" width="200" alt="Connect Screen"><img src="media/config-screen.png" width="200" alt="Config Screen"><img src="media/pano-screen.png" width="200" alt="Panorama Status and Pause Commands">
 
 Features
 ========
