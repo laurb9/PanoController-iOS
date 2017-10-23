@@ -206,7 +206,7 @@ func getMenus(_ config: Config) -> Menu {
                 ]),
         ]),
         Menu("🛠 Advanced", using: config, entries: [
-            Switch("Motors", using: config, key: "motors_on", true),
+            Switch("Motors", using: config, key: "motors_on", false),
             ]),
     ])
     return menus
