@@ -25,7 +25,7 @@ class PanoControllerTests: XCTestCase {
 
     func testDataKVToDict(){
         let data = "FOO AAA=1111 BBB=1 CCC=ABC".data(using: .ascii)!
-        XCTAssertEqual(data.kvToDict(), ["AAA": "1111", "BBB": "1", "CCC": "ABC"])
+        XCTAssertEqual(data.kvToDict()!, ["AAA": "1111", "BBB": "1", "CCC": "ABC"])
     }
 
     func testCameraLensFOV(){
