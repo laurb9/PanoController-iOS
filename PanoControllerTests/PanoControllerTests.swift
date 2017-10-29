@@ -66,15 +66,19 @@ class PanoControllerTests: XCTestCase {
         pano.preShutter = 0
         pano.postShutter = 0
         let gcode = pano.gCode()
-        XCTAssertEqual(gcode,
-                       ["M17 G1 G91 G92 A0 C0",
-                        "A0.00 C0.00", "M116 P10 Q11", "M240 P0.01 Q0 R0",
-                        "A4.31 C0.00", "M116 P10 Q11", "M240 P0.01 Q0 R0",
-                        "A-4.31 C-3.03", "M116 P10 Q11", "M240 P0.01 Q0 R0",
-                        "A4.31 C0.00", "M116 P10 Q11", "M240 P0.01 Q0 R0",
-                        "A-4.31 C-3.03", "M116 P10 Q11", "M240 P0.01 Q0 R0",
-                        "A4.31 C0.00", "M116 P10 Q11", "M240 P0.01 Q0 R0",
-                        "G0 G28", "M18"])
+        let expected = [
+            "M17 G1 G91 G92 A0 C0",
+            "A0.00 C0.00 M114 M503", "M116 P10 Q115", "M240 P0.01 Q0 R0",
+            "A4.31 C0.00 M114 M503", "M116 P10 Q115", "M240 P0.01 Q0 R0",
+            "A-4.31 C-3.03 M114 M503", "M116 P10 Q115", "M240 P0.01 Q0 R0",
+            "A4.31 C0.00 M114 M503", "M116 P10 Q115", "M240 P0.01 Q0 R0",
+            "A-4.31 C-3.03 M114 M503", "M116 P10 Q115", "M240 P0.01 Q0 R0",
+            "A4.31 C0.00 M114 M503", "M116 P10 Q115", "M240 P0.01 Q0 R0",
+            "G0 G28",
+            "M18 M114 M503"]
+        for (gcodeLine, expectedLine) in zip(gcode, expected) {
+            XCTAssertEqual(gcodeLine, expectedLine)
+        }
     }
 
     func test360PanoGCode() {
@@ -86,17 +90,21 @@ class PanoControllerTests: XCTestCase {
         pano.preShutter = 0
         pano.postShutter = 0.5
         let gcode = pano.gCode()
-        XCTAssertEqual(gcode,
-                       ["M17 G1 G91 G92 A0 C0",
-                        "A0.00 C0.00", "M116 P10 Q225", "M240 P0.01 Q0 R0.5",
-                        "A90.00 C0.00", "M116 P10 Q225", "M240 P0.01 Q0 R0.5",
-                        "A90.00 C0.00", "M116 P10 Q225", "M240 P0.01 Q0 R0.5",
-                        "A90.00 C0.00", "M116 P10 Q225", "M240 P0.01 Q0 R0.5",
-                        "A90.00 C-51.00", "M116 P10 Q225", "M240 P0.01 Q0 R0.5",
-                        "A90.00 C0.00", "M116 P10 Q225", "M240 P0.01 Q0 R0.5",
-                        "A90.00 C0.00", "M116 P10 Q225", "M240 P0.01 Q0 R0.5",
-                        "A90.00 C0.00", "M116 P10 Q225", "M240 P0.01 Q0 R0.5",
-                        "G0 G28", "M18"])
+        let expected = [
+            "M17 G1 G91 G92 A0 C0",
+            "A0.00 C0.00 M114 M503", "M116 P10 Q2250", "M240 P0.01 Q0 R0.5",
+            "A90.00 C0.00 M114 M503", "M116 P10 Q2250", "M240 P0.01 Q0 R0.5",
+            "A90.00 C0.00 M114 M503", "M116 P10 Q2250", "M240 P0.01 Q0 R0.5",
+            "A90.00 C0.00 M114 M503", "M116 P10 Q2250", "M240 P0.01 Q0 R0.5",
+            "A90.00 C-51.00 M114 M503", "M116 P10 Q2250", "M240 P0.01 Q0 R0.5",
+            "A90.00 C0.00 M114 M503", "M116 P10 Q2250", "M240 P0.01 Q0 R0.5",
+            "A90.00 C0.00 M114 M503", "M116 P10 Q2250", "M240 P0.01 Q0 R0.5",
+            "A90.00 C0.00 M114 M503", "M116 P10 Q2250", "M240 P0.01 Q0 R0.5",
+            "G0 G28",
+            "M18 M114 M503"]
+        for (gcodeLine, expectedLine) in zip(gcode, expected) {
+            XCTAssertEqual(gcodeLine, expectedLine)
+        }
     }
 
     /*
