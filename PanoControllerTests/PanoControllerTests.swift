@@ -23,6 +23,11 @@ class PanoControllerTests: XCTestCase {
         super.tearDown()
     }
 
+    func testDataKVToDict(){
+        let data = "FOO AAA=1111 BBB=1 CCC=ABC".data(using: .ascii)!
+        XCTAssertEqual(data.kvToDict(), ["AAA": "1111", "BBB": "1", "CCC": "ABC"])
+    }
+
     func testCameraLensFOV(){
         XCTAssertEqual(Pano.lensFOV(for: 36, at: 8), 132.08, accuracy: 0.01)
         XCTAssertEqual(Pano.lensFOV(for: 36, at: 24), 73.74, accuracy: 0.01)
@@ -34,6 +39,8 @@ class PanoControllerTests: XCTestCase {
     func testPanoComputeGrid(){
 
         // 360 pano
+        pano.focalLength = 35
+        pano.panoVertFOV = 180
         pano.panoHorizFOV = 360
         pano.computeGrid()
         XCTAssertEqual(pano.cols, 9)

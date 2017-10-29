@@ -11,9 +11,9 @@
 
 import UIKit
 
-class MenuTableViewController: UITableViewController, PanoPeripheralDelegate {
-    // FIXME: use global context, this seems unsafe. config should be a singleton probably
+class MenuTableViewController: UITableViewController {
     var panoPeripheral: PanoPeripheral?
+    var pano: Pano?
     var menus: Menu?
     @IBOutlet weak var deviceUILabel: UILabel!
     @IBOutlet weak var panoUIBarButtonItem: UIBarButtonItem!
@@ -30,8 +30,8 @@ class MenuTableViewController: UITableViewController, PanoPeripheralDelegate {
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
         panoPeripheral?.delegate = self
-        if let p = panoPeripheral {
-            menus = getMenus(p.config)
+        if let pano = pano {
+            menus = getMenus(pano)
         }
     }
 
@@ -134,7 +134,7 @@ class MenuTableViewController: UITableViewController, PanoPeripheralDelegate {
         let switchPosition = sender.convert(CGPoint.zero, to: tableView)
         if let indexPath = tableView.indexPathForRow(at: switchPosition),
             let menuItem = menus![indexPath] as? RangeSelector {
-            menuItem.current = Int16(Int(sender.value))
+            menuItem.current = Int(sender.value)
         }
     }
 
@@ -165,11 +165,15 @@ class MenuTableViewController: UITableViewController, PanoPeripheralDelegate {
             destinationController.title = destinationController.menuItem?.name
         } else if let panoViewController = segue.destination as? PanoViewController {
             panoViewController.panoPeripheral = panoPeripheral
+            panoViewController.pano = pano
+            panoPeripheral?.delegate = pano
         }
     }
+}
 
-    // MARK: - PanoPeripheralDelegate
+// MARK: - PanoPeripheralDelegate
 
+extension MenuTableViewController : PanoPeripheralDelegate {
     func panoPeripheralDidConnect(_ panoPeripheral: PanoPeripheral){
         self.deviceUILabel.text = panoPeripheral.name
         panoUIBarButtonItem.isEnabled = true
@@ -179,10 +183,15 @@ class MenuTableViewController: UITableViewController, PanoPeripheralDelegate {
         panoPeripheral.delegate = nil
         performSegue(withIdentifier: "devices", sender: self)
     }
+    func panoPeripheral(_ panoPeripheral: PanoPeripheral, didReceiveLine line: String) {
+        // FIXME: should send to pano
+    }
+    /* FIXME:
     func panoPeripheral(_ panoPeripheral: PanoPeripheral, didReceiveStatus status: Status){
         if panoPeripheral.status.running == 1 {
             panoPeripheral.delegate = nil
             performSegue(withIdentifier: "pano", sender: self)
         }
     }
+    */
 }

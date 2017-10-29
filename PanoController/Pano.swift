@@ -8,6 +8,37 @@
 
 import Foundation
 
+extension String {
+    func kvToDict() -> [String: String]? {
+        let vals = self
+            .split(separator: " ")
+            .flatMap { (s) -> (String, String)? in
+                let kv = s.split(separator: "=", maxSplits: 1)
+                if kv.count == 2 {
+                    let key = kv[0], val = kv[1]
+                    return (String(key), String(val))
+                } else {
+                    return nil
+                }
+        }
+        if vals.count > 0 {
+            return Dictionary(vals, uniquingKeysWith: { (old, new) in new })
+        } else {
+            return nil
+        }
+    }
+}
+
+extension Data {
+    // Convert Data containing key=value pairs into a Dictionary<String:String>
+    func kvToDict() -> [String: String]? {
+        if let kvPairs = String.init(data: self, encoding: .utf8){
+            return kvPairs.kvToDict()
+        }
+        return nil
+    }
+}
+
 extension Double {
     func format(_ precision: Int) -> String {
         return String(format: "%.\(precision)f", self)
@@ -20,6 +51,13 @@ extension Double {
 }
 
 class Pano : NSObject {
+    enum State {
+        case Idle
+        case Running
+        case Paused
+        case End
+    }
+    var state: State = .Idle
 
     // Configuration
     var focalLength = 35.0     // mm
@@ -30,8 +68,8 @@ class Pano : NSObject {
     var postShutter = 0.0      // s
     var shutterLong = false
     var shotCount = 1
-    var panoHorizFOV = 360.0   // 1-360°
-    var panoVertFOV = 180.0    // 1-180°
+    var panoHorizFOV = 180.0   // 1-360°
+    var panoVertFOV = 90.0    // 1-180°
     var overlap = 0.2          // 0 - 1 (representing 0% - 100%)
 
     // State
@@ -43,7 +81,12 @@ class Pano : NSObject {
     var rows = 0
     var cols = 0
 
-    // Generate the gCode commands to execute the current pano
+    // G-Code Interpreter Status and Configs
+    var platform: [String: String] = [:]
+    var program: IndexingIterator<[String]>?
+
+    // Generate the gCode program to execute the current pano
+    // TODO: make a generator
     func gCode() -> [String] {
         var gcode: Array<String> = []
         computeGrid()
@@ -53,9 +96,9 @@ class Pano : NSObject {
         for row in 0..<rows {
             for col in 0..<cols {
                 let (horizMove, vertMove) = moveTo(row: row, col: col)
-                gcode.append("A\(horizMove.format(2)) C\(vertMove.format(2))")
+                gcode.append("A\(horizMove.format(2)) C\(vertMove.format(2)) M114 M503")
                 if (preShutter > 0){
-                    gcode.append("G4 P\(preShutter.format()))")
+                    gcode.append("G4 P\(preShutter.format())")
                 }
                 gcode.append("M116 P10 Q\(steadyTarget.format(0))")
                 if (shutter > 0){
@@ -68,7 +111,7 @@ class Pano : NSObject {
             }
         }
         gcode.append("G0 G28")
-        gcode.append("M18")
+        gcode.append("M18 M114 M503")
         return gcode
     }
 
@@ -76,6 +119,7 @@ class Pano : NSObject {
     func moveTo(to targetPosition: Int) -> (Double, Double) {
         return moveTo(row: targetPosition / cols, col: targetPosition % cols);
     }
+
     // Move to specified grid position
     // @param row: requested row position [0 - vert_count)
     // @param col: requested col position [0 - horiz_count)
@@ -151,8 +195,68 @@ class Pano : NSObject {
         return 360.0 * atan(sensorSize / 2.0 / focalLength) / Double.pi
     }
 
-    // Calculate max angular velocity [µ°/s] for this shutter, focal length and sensor size
+    // Calculate max angular velocity [0.001°/s] for this shutter, focal length and sensor size
     static func steadyTarget(for sensorSize: Double, at focalLength: Double, resolution: Int, shutter: Double) -> Double {
-        return 1000000 * shutter * lensFOV(for: sensorSize, at: focalLength) / Double(resolution)
+        return 1000 * lensFOV(for: sensorSize, at: focalLength) / Double(resolution) / shutter
+    }
+
+    // Start sending/executing the generated gCode
+    func startProgram(_ panoPeripheral: PanoPeripheral) {
+        state = .Running
+        program = gCode().makeIterator()
+        panoPeripheral.writeLine("%")
+    }
+}
+
+// MARK: -- PanoPeripheralDelegate
+
+extension Pano : PanoPeripheralDelegate {
+    func panoPeripheralDidConnect(_ panoPeripheral: PanoPeripheral){
+        // Request firmware and configuration info on connect
+        panoPeripheral.writeLine("M115 M503 M117 M114")
+    }
+
+    func panoPeripheralDidDisconnect(_ panoPeripheral: PanoPeripheral){
+    }
+
+    func panoPeripheral(_ panoPeripheral: PanoPeripheral, didReceiveLine line: String){
+        if let updates = line.kvToDict() {
+            // Received status updates as a k=v structure
+            platform.merge(updates, uniquingKeysWith: { (_, new) in new })
+        } else if state == .Running && line.starts(with: "ok") {
+            // Received ack for previous command, send next one
+            if let command = program?.next() {
+                panoPeripheral.writeLine(command)
+            } else {
+                // End of program
+                state = .End
+            }
+        }
+    }
+}
+
+// MARK: -- MenuDelegate
+// Receive user menu selections and update the configuration
+
+extension Pano: MenuItemDelegate {
+
+    func menuItem(didSet index: MenuItemKey, value: Any){
+        switch index {
+        case .horizFOV:    self.panoHorizFOV = Double(value as! Int)
+        case .vertFOV:     self.panoVertFOV = Double(value as! Int)
+        case .focalLength: self.focalLength = Double(value as! Int)
+        case .shutter:     self.shutter = value as! Double
+        case .preShutter:  self.preShutter = value as! Double
+        case .postShutter: self.postShutter = value as! Double
+        case .shutterLong: self.shutterLong = value as! Bool
+        case .shotCount:   self.shotCount = value as! Int
+        case .aspect:
+            switch value as! Int {
+            case 32: (self.sensorWidth, self.sensorHeight) = (36, 24)
+            case 23: (self.sensorWidth, self.sensorHeight) = (24, 36)
+            default: break
+            }
+        }
+        computeGrid()
     }
 }

@@ -12,10 +12,11 @@
 import CoreBluetooth
 import UIKit
 
-class DeviceTableViewController: UITableViewController, CBCentralManagerDelegate, PanoPeripheralDelegate {
+class DeviceTableViewController: UITableViewController {
     var bleManager: CBCentralManager!
     var peripheral: CBPeripheral?
     var panoPeripheral: PanoPeripheral?
+    var pano: Pano?
     var peripherals: [CBPeripheral] = []
     @IBOutlet weak var navTitle: UINavigationItem!
     @IBOutlet weak var settingsUIBarButtonItem: UIBarButtonItem!
@@ -67,11 +68,7 @@ class DeviceTableViewController: UITableViewController, CBCentralManagerDelegate
                 if panoPeripheral?.peripheral == nil {
                     cell.nameView.text! += "\n(identifying)"
                 } else if panoPeripheral?.peripheral == thisPeripheral {
-                    if (panoPeripheral?.status.running == 1){
-                        cell.nameView.text! += "\nStatus: running, at photo \(panoPeripheral!.status.position+1), battery \(Float(abs(panoPeripheral!.status.battery))/1000.0)V"
-                    } else {
-                        cell.nameView.text! += "\nStatus: ready"
-                    }
+                    cell.nameView.text! += "\nStatus: ready"
                 }
             } else {
                 cell.connectingView.startAnimating()
@@ -141,7 +138,11 @@ class DeviceTableViewController: UITableViewController, CBCentralManagerDelegate
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
         if let menuTableViewController = segue.destination as? MenuTableViewController {
-            menuTableViewController.panoPeripheral = panoPeripheral
+            menuTableViewController.pano = pano
+            if let panoPeripheral = panoPeripheral {
+                menuTableViewController.panoPeripheral = panoPeripheral
+                panoPeripheral.delegate = pano
+            }
         }
     }
 
@@ -149,8 +150,12 @@ class DeviceTableViewController: UITableViewController, CBCentralManagerDelegate
         //if let _ = sender.source as? OptionViewController,
         //}
     }
+}
 
-    // MARK: - CentralManagerDelegate
+
+// MARK: - CentralManagerDelegate
+
+extension DeviceTableViewController : CBCentralManagerDelegate {
 
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
         switch central.state {
@@ -191,6 +196,7 @@ class DeviceTableViewController: UITableViewController, CBCentralManagerDelegate
 
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         print("didConnect \(peripheral.name!)")
+        pano = Pano()
         panoPeripheral = PanoPeripheral(peripheral, delegate: self)
         tableView.reloadData()
     }
@@ -212,21 +218,21 @@ class DeviceTableViewController: UITableViewController, CBCentralManagerDelegate
         central.scanForPeripherals(withServices: nil, options: nil)
         tableView.reloadData()
     }
+}
 
-    // MARK: - PanoPeripheralDelegate
+
+// MARK: - PanoPeripheralDelegate
+
+extension DeviceTableViewController : PanoPeripheralDelegate {
+    func panoPeripheral(_ panoPeripheral: PanoPeripheral, didReceiveLine line: String) {
+        pano?.panoPeripheral(panoPeripheral, didReceiveLine: line)
+    }
 
     func panoPeripheralDidConnect(_ panoPeripheral: PanoPeripheral){
-        panoPeripheral.delegate = nil  // avoid triggering the segue multiple times
+        panoPeripheral.delegate = pano  // avoid triggering the segue multiple times
         UserDefaults.standard.set(panoPeripheral.peripheral?.identifier.uuidString, forKey: "lastPeripheralUUID")
-        if panoPeripheral.status.running == 1 {
-            performSegue(withIdentifier: "pano", sender: self)
-        } else {
-            performSegue(withIdentifier: "settings", sender: self)
-        }
+        performSegue(withIdentifier: "settings", sender: self)
     }
     func panoPeripheralDidDisconnect(_ panoPeripheral: PanoPeripheral){
-    }
-    func panoPeripheral(_ panoPeripheral: PanoPeripheral, didReceiveStatus status: Status){
-        tableView.reloadData() // too lazy
     }
 }

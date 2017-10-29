@@ -33,6 +33,7 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
     @IBOutlet weak var vertUILabel: UILabel!
     @IBOutlet weak var padUIView: UIView!
     var padViewController: PadViewController!
+    var pano: Pano?
     var panoPeripheral: PanoPeripheral?
 
     override func viewDidLoad() {
@@ -41,17 +42,57 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
 
     override func viewWillAppear(_ animated: Bool) {
         print("PanoViewControler: \(String(describing: panoPeripheral))")
-        if let panoPeripheral = panoPeripheral {
+        if let panoPeripheral = panoPeripheral,
+            let pano = pano {
             panoPeripheral.delegate = self
-            self.lensUILabel.text = "\(panoPeripheral.config["focal"])"
-            self.shutterUILabel.text = "\(panoPeripheral.config["shutter"])ms"
-            self.horizUILabel.text = "\(panoPeripheral.config["horiz"])"
-            self.vertUILabel.text = "\(panoPeripheral.config["vert"])"
+            pano.panoPeripheralDidConnect(panoPeripheral)
+            self.lensUILabel.text = "\(Int(pano.focalLength))"
+            self.shutterUILabel.text = pano.shutter >= 0.25 ? "\(pano.shutter)s" : "1/\(Int(1/pano.shutter))s"
+            self.horizUILabel.text = "\(pano.panoHorizFOV)"
+            self.vertUILabel.text = "\(pano.panoVertFOV)"
             self.nameUILabel.text = panoPeripheral.name
             self.identifierUILabel.text = panoPeripheral.peripheral?.identifier.uuidString
             //self.signalUILabel.text = ...
+            updateStatus()
         }
         setButtonStates(start: true, pause: false, cancel: false)
+    }
+
+    func updateStatus() {
+        if let pano = pano {
+            batteryUILabel.text = String(format: "%.1fV", arguments:[Float(pano.platform["Battery", default: "0"])!])
+            motorsUILabel.text = Bool(pano.platform["MotorsEnabled"] ?? "false")! ? "⚡️" : "💤"
+            rowsUILabel.text = "\(pano.rows)"
+            colsUILabel.text = "\(pano.cols)"
+            if pano.cols > 0 {
+                currentRowUILabel.text = "\(pano.position / pano.cols + 1)"
+                currentColUILabel.text = "\(pano.position % pano.cols + 1)"
+                positionUILabel.text = "#\(pano.position + 1) of \(pano.rows * pano.cols)"
+                if pano.state == .Idle {
+                    panoUIProgressView.progress = 0.0
+                } else {
+                    panoUIProgressView.progress = Float(pano.position + 1) / Float(pano.rows * pano.cols)
+                }
+            }
+            steadyDelayUILabel.text = String(format: "%.1fs", arguments:[Double(pano.platform["ZeroMotionWait", default: "0"])!])
+            horizOffsetUILabel.text = pano.platform["CurrentA", default: "0"]
+            vertOffsetUILabel.text = pano.platform["CurrentC", default: "0"]
+            switch pano.state {
+            case .Running:
+                statusUILabel.text = "▶️"
+                setButtonStates(start: false, pause: true, cancel: true)
+            case .Paused:
+                statusUILabel.text = "⏸"
+                setButtonStates(start: false, pause: false, cancel: true)
+                showPadView(for: .gridMove)
+            case .End:
+                statusUILabel.text = "⏹"
+                setButtonStates(start: true, pause: false, cancel: false)
+            default:
+                statusUILabel.text = "🕸"
+                setButtonStates(start: padUIView.isHidden, pause: false, cancel: !padUIView.isHidden)
+            }
+        }
     }
 
     func setButtonStates(start: Bool, pause: Bool, cancel: Bool){
@@ -70,15 +111,24 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
     
     @IBAction func startPano(_ sender: UIButton) {
         showPadView(for: .freeMove)
-        setButtonStates(start: false, pause: false, cancel: true)
+        if let pano = pano, let panoPeripheral = panoPeripheral {
+            pano.state = .Idle
+            pano.panoPeripheralDidConnect(panoPeripheral) // triggers updateStatus() on receive
+        }
     }
     @IBAction func pausePano(_ sender: UIButton) {
-        panoPeripheral?.send(command: .pause)
+        //FIXME: ???
         showPadView(for: .gridMove)
-        setButtonStates(start: false, pause: false, cancel: true)
+        if let pano = pano, let panoPeripheral = panoPeripheral {
+            pano.state = .Paused
+            pano.panoPeripheralDidConnect(panoPeripheral) // triggers updateStatus() on receive
+        }
     }
     @IBAction func cancelPano(_ sender: UIButton) {
-        panoPeripheral?.send(command: .cancel)
+        //FIXME: gcode, use Pano
+        panoPeripheral?.writeLine("G0 G28")
+        panoPeripheral?.writeLine("M18 M114 M503")
+        pano?.state = .End
         hidePadView()
         setButtonStates(start: true, pause: false, cancel: false)
     }
@@ -87,6 +137,7 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
         padViewController.moveMode = moveMode
         if padUIView.isHidden {
             print("showing PadView in \(moveMode)")
+            self.panoPeripheral?.writeLine("M17 M503 M114") // FIXME: gcode, use Pano
             padUIView.isHidden = false
             UIView.animate(withDuration: 0.5, animations: { self.padUIView.alpha = 1 })
         }
@@ -116,8 +167,12 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
 
     @IBAction func unwindToStatus(sender: UIStoryboardSegue){
         print("unwindToStatus from \(sender)")
-        panoPeripheral?.send(command: .start)
         hidePadView()
+        if let panoPeripheral = panoPeripheral,
+            let pano = pano,
+            pano.state == .End || pano.state == .Idle {
+            pano.startProgram(panoPeripheral)
+        }
     }
 
     // MARK: - PanoPeripheralDelegate
@@ -127,32 +182,8 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
     func panoPeripheralDidDisconnect(_ panoPeripheral: PanoPeripheral){
         performSegue(withIdentifier: "devices", sender: self)
     }
-    func panoPeripheral(_ panoPeripheral: PanoPeripheral, didReceiveStatus status: Status){
-        batteryUILabel.text = String(format: "%.1fV", arguments:[Float(abs(status.battery))/1000.0])
-        motorsUILabel.text = status.motors_on == 1 ? "⚡️" : "💤"
-        if status.running == 1 {
-            rowsUILabel.text = "\(status.rows)"
-            colsUILabel.text = "\(status.cols)"
-            currentRowUILabel.text = "\(status.position / status.cols + 1)"
-            currentColUILabel.text = "\(status.position % status.cols + 1)"
-            positionUILabel.text = "#\(status.position+1) of \(status.rows*status.cols)"
-            panoUIProgressView.progress = Float(status.position+1) / Float(status.rows*status.cols)
-            steadyDelayUILabel.text = String(format: "%.1fs", arguments:[Float(status.steady_delay_avg)/1000.0])
-        }
-        horizOffsetUILabel.text = "\(status.horiz_offset)"
-        vertOffsetUILabel.text = "\(panoPeripheral.config["vert"] + status.vert_offset)"
-        switch (status.running, status.paused) {
-        case (1, 0):
-            statusUILabel.text = "▶️"
-            setButtonStates(start: false, pause: true, cancel: true)
-        case (1, 1):
-            statusUILabel.text = "⏸"
-            setButtonStates(start: false, pause: false, cancel: true)
-        default:
-            statusUILabel.text = "⏹"
-        }
-        if status.running == 1 && status.paused == 1 {
-            showPadView(for: .gridMove)
-        }
+    func panoPeripheral(_ panoPeripheral: PanoPeripheral, didReceiveLine line: String) {
+        pano?.panoPeripheral(panoPeripheral, didReceiveLine: line)
+        updateStatus()
     }
 }

@@ -12,12 +12,15 @@ import CoreBluetooth
 protocol PanoPeripheralDelegate {
     func panoPeripheralDidConnect(_ panoPeripheral: PanoPeripheral)
     func panoPeripheralDidDisconnect(_ panoPeripheral: PanoPeripheral)
-    func panoPeripheral(_ panoPeripheral: PanoPeripheral, didReceiveStatus status: Status)
+    func panoPeripheral(_ panoPeripheral: PanoPeripheral, didReceiveLine: String)
 }
 
-class PanoPeripheral : NSObject, CBPeripheralDelegate, ConfigDelegate {
-    let status: Status
-    let config: Config
+class PanoPeripheral : NSObject, CBPeripheralDelegate {
+    var dataIn = Data()
+    var dataInReadOffset = 0
+    var dataOut = Data()
+    var dataOutWriteOffset = 0
+    let blockSize = 20     // how many bytes we can send at once - should read from characteristic
     var delegate: PanoPeripheralDelegate?
     var connected: Bool = false
     var isReady: Bool {
@@ -29,22 +32,13 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate, ConfigDelegate {
     static let uartTxCharUUID = CBUUID(string: "6E400002-B5A3-F393-E0A9-E50E24DCCA9E")
     static let uartRxCharUUID = CBUUID(string: "6E400003-B5A3-F393-E0A9-E50E24DCCA9E")
     static let serviceUUID = CBUUID(string: "2017")
-    static let configCharUUID = CBUUID(string: "0001")
-    static let statusCharUUID = CBUUID(string: "0002")
-    static let cmdCharUUID = CBUUID(string: "0003")
-    var statusChar: CBCharacteristic?
     var uartTxChar: CBCharacteristic?
     var uartRxChar: CBCharacteristic?
-    var configChar: CBCharacteristic?
-    var cmdChar: CBCharacteristic?
 
     var peripheral: CBPeripheral?
 
     init(_ peripheral: CBPeripheral) {
-        self.status = Status()
-        self.config = Config()
         super.init()
-        config.delegate = self
         self.peripheral = peripheral
         self.peripheral!.delegate = self
         peripheral.discoverServices(nil)
@@ -60,80 +54,9 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate, ConfigDelegate {
     }
 
     func checkIfReady() {
-        if !connected &&
-            statusChar != nil &&
-            uartRxChar != nil &&
-            (uartTxChar != nil || cmdChar != nil) {
+        if !connected && uartRxChar != nil && uartTxChar != nil {
             connected = true
-            sendConfig()
             delegate?.panoPeripheralDidConnect(self)
-        }
-    }
-
-    // Mark: - ConfigDelegate
-
-    func config(_ config: Config, didSetIndex index: String, withValue value: Int16) {
-        if let characteristic = uartTxChar ?? configChar {
-            var data = Data()
-            config.serialize(index: index, into: &data)
-            print("sending \(data) for \(index) to \(characteristic)")
-            peripheral?.writeValue(data, for: characteristic, type: .withResponse)
-        }
-    }
-
-    // Mark: - Pano Device Control Send/Receive operations
-
-    func readStatus() -> Status {
-        return status
-    }
-
-    func sendConfig() {
-        for key in config.keys {
-            config(config, didSetIndex: key, withValue: config[key])
-        }
-    }
-
-    enum Command : UInt8 {
-        case start = 0x61
-        case cancel = 0x62
-        case pause = 0x63
-        case shutter = 0x64
-        case setHome = 0x65
-        case goHome = 0x66
-        case sendStatus = 0x67
-        case freeMove = 0x68
-        case incMove = 0x69
-    }
-    enum Direction : UInt8 {
-        case forward = 0x3e
-        case back = 0x3c
-        case up = 0x5e
-        case down = 0x76
-    }
-    func sendFreeMove(horizontal: Float, vertical: Float) {
-        if let characteristic =  uartTxChar ?? cmdChar {
-            let horiz = Int16(horizontal*100)
-            let vert = Int16(vertical*100)
-            var data = Data(bytes: [Command.freeMove.rawValue])
-            Config.serialize(horiz, into: &data)
-            Config.serialize(vert, into: &data)
-            print("sending FreeMove(\(horiz), \(vert) (\(data)) to \(characteristic)")
-            peripheral?.writeValue(data, for: characteristic, type: .withResponse)
-        }
-    }
-    func sendIncMove(_ direction: Direction){
-        if let characteristic = uartTxChar ?? cmdChar {
-            var data = Data(bytes: [Command.incMove.rawValue])
-            data.append(direction.rawValue)
-            print("sending IncMove(\(direction)) (\(data)) to \(characteristic)")
-            peripheral?.writeValue(data, for: characteristic, type: .withResponse)
-        }
-    }
-    func send(command: Command) {
-        if let characteristic = uartTxChar ?? cmdChar {
-            let data = Data(bytes: [command.rawValue])
-            print("sending command \(command) (\(data)) to \(characteristic)")
-            peripheral?.writeValue(data, for: characteristic, type: .withResponse)
         }
     }
 
@@ -153,25 +76,13 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate, ConfigDelegate {
         for characteristic in service.characteristics! {
             let thisCharacteristic = characteristic as CBCharacteristic
             print("         ", thisCharacteristic)
-            if service.uuid == PanoPeripheral.serviceUUID {
-                if thisCharacteristic.uuid == PanoPeripheral.statusCharUUID {
-                    statusChar = thisCharacteristic
-                    peripheral.setNotifyValue(true, for: statusChar!)
-                    peripheral.readValue(for: statusChar!)
-                }
-                if thisCharacteristic.uuid == PanoPeripheral.cmdCharUUID {
-                    cmdChar = thisCharacteristic
-                }
-                if thisCharacteristic.uuid == PanoPeripheral.configCharUUID {
-                    configChar = thisCharacteristic
-                }
-            }
             if service.uuid == PanoPeripheral.uartServiceUUID {
                 if thisCharacteristic.uuid == PanoPeripheral.uartTxCharUUID {
                     uartTxChar = thisCharacteristic
                 }
                 if thisCharacteristic.uuid == PanoPeripheral.uartRxCharUUID {
                     uartRxChar = thisCharacteristic
+                    peripheral.setNotifyValue(true, for: uartRxChar!)
                 }
             }
             //peripheral.discoverDescriptors(for: thisCharacteristic)
@@ -191,11 +102,12 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate, ConfigDelegate {
         //print("didUpdateValueFor \(String(describing: characteristic))")
         switch characteristic.uuid {
         case PanoPeripheral.uartRxCharUUID:
-            print(characteristic.value!) // not expecting to receive anything, but maybe leave code for future
-
-        case PanoPeripheral.statusCharUUID:
-            status.deserialize(characteristic.value!)
-            delegate?.panoPeripheral(self, didReceiveStatus: status)
+            dataIn.append(characteristic.value!)
+            //let s = String(data: characteristic.value!, encoding: .ascii)
+            //print("Received \(s)")
+            while let line = readLine() {
+                delegate?.panoPeripheral(self, didReceiveLine: line)
+            }
 
         default:
             print("Received update for unknown characteristic \(String(describing: characteristic))")
@@ -203,11 +115,55 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate, ConfigDelegate {
     }
 
     func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
-        print("didUpdateNotificationStateFor \(String(describing: characteristic))")
+        //print("didUpdateNotificationStateFor \(String(describing: characteristic))")
     }
 
     func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
         //print("didWriteValueForCharacteristic \(String(describing: characteristic)) error=\(String(describing: error))")
+        // send more data
+        sendDataOut()
+    }
+
+    // MARK: -- UART Read-Write
+
+    // Send a block of data from dataOut, emptying it when finished
+    func sendDataOut(){
+        let end = min(dataOutWriteOffset + blockSize, dataOut.count)
+        if end > 0 {
+            let buf = dataOut.subdata(in: dataOutWriteOffset..<end)
+            dataOutWriteOffset = end
+            self.peripheral?.writeValue(buf, for: uartTxChar!, type: .withResponse)
+            if end == dataOut.count {
+                dataOut.removeAll(keepingCapacity: true)
+                dataOutWriteOffset = 0
+            }
+        }
+    }
+
+    func writeLine(_ line: String){
+        if let data = line.data(using: .ascii, allowLossyConversion: true) {
+            dataOut.append(data)
+            dataOut.append(10)
+        }
+        if dataOutWriteOffset == 0 {
+            sendDataOut()
+        }
+    }
+
+    let eol = "\r\n".data(using: .ascii)!
+    func readLine() -> String? {
+        let line: String?
+        if let end = (dataInReadOffset..<dataIn.count).index( where: { eol.contains(dataIn[$0]) } ) {
+            line = String(data: dataIn.subdata(in: dataInReadOffset..<end), encoding: .ascii)
+            dataInReadOffset = (end..<dataIn.count).index( where: { dataIn[$0] > 32 }) ?? end+1
+            if dataInReadOffset >= dataIn.count {
+                dataIn.removeAll(keepingCapacity: true)
+                dataInReadOffset = 0
+            }
+        } else {
+            line = nil
+        }
+        return line
     }
 
     // MARK: -- CustomStringConvertible
