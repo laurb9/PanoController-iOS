@@ -83,36 +83,50 @@ class Pano : NSObject {
 
     // G-Code Interpreter Status and Configs
     var platform: [String: String] = [:]
-    var program: IndexingIterator<[String]>?
+    var program: AnyIterator<String>?
 
-    // Generate the gCode program to execute the current pano
-    // TODO: make a generator
-    func gCode() -> [String] {
-        var gcode: Array<String> = []
+    // Generate the gCode program to execute the current pano step by step
+    // While harder on the eyes, this allows in-flight changing parameters like position, for example
+    var gCode: AnyIterator<String> {
         computeGrid()
         let steadyTarget = Pano.steadyTarget(for: sensorHeight, at: focalLength, resolution: 4000, shutter: shutter)
-        position = 0
-        gcode.append("M17 G1 G91 G92 A0 C0")
-        for row in 0..<rows {
-            for col in 0..<cols {
-                let (horizMove, vertMove) = moveTo(row: row, col: col)
-                gcode.append("A\(horizMove.format(2)) C\(vertMove.format(2)) M114 M503")
-                if (preShutter > 0){
-                    gcode.append("G4 P\(preShutter.format())")
-                }
-                gcode.append("M116 P10 Q\(steadyTarget.format(0))")
-                if (shutter > 0){
-                    for _ in 0..<shotCount {
-                        gcode.append("M240 P\(shutter.format()) Q\(shutterLong ? 1 : 0) R\(postShutter.format())")
+        var commandBuffer = ["M17 G1 G91 G92 A0 C0"].makeIterator()
+        self.position = 0
+        var targetPosition = 0  // moveTo() keeps track of the previous position to calculate offsets, so we cannot modify it directly
+        return AnyIterator<String> {
+            // Awkward state keeping. There has got to be a better way! Maybe a queue ?
+            // Send from buffer as long as it's not empty
+            if let cmd = commandBuffer.next() {
+                return cmd
+            } else {
+                // Command buffer is empty, replace with a new one
+                var commands: [String] = []
+                if targetPosition < self.rows * self.cols {
+                    // Actual program
+                    let (horizMove, vertMove) = self.moveTo(to: targetPosition)
+                    commands.append("A\(horizMove.format(2)) C\(vertMove.format(2)) M114 M503")
+                    if (self.preShutter > 0){
+                        commands.append("G4 P\(self.preShutter.format())")
                     }
-                } else {
-                    gcode.append("M0")
+                    commands.append("M116 P10 Q\(steadyTarget.format(0))")
+                    if (self.shutter > 0){
+                        for _ in 0..<self.shotCount {
+                            commands.append("M240 P\(self.shutter.format()) Q\(self.shutterLong ? 1 : 0) R\(self.postShutter.format())")
+                        }
+                    } else {
+                        commands.append("M0")
+                    }
+                    targetPosition += 1
+                    if targetPosition == self.rows * self.cols {
+                        // End of program
+                        commands += ["G0 G28", "M18 M114 M503"]
+                    }
                 }
+                commandBuffer = commands.makeIterator()
+                let cmd = commandBuffer.next()
+                return cmd
             }
         }
-        gcode.append("G0 G28")
-        gcode.append("M18 M114 M503")
-        return gcode
     }
 
     // Move to grid position by photo index (0-number of photos)
@@ -203,8 +217,8 @@ class Pano : NSObject {
     // Start sending/executing the generated gCode
     func startProgram(_ panoPeripheral: PanoPeripheral) {
         state = .Running
-        program = gCode().makeIterator()
-        panoPeripheral.writeLine("%")
+        program = gCode
+        panoPeripheral.writeLine("%") // the rest of execution is in panoPeripheralDidReceiveLine
     }
 }
 

@@ -65,7 +65,7 @@ class PanoControllerTests: XCTestCase {
         pano.shutter = 1/100
         pano.preShutter = 0
         pano.postShutter = 0
-        let gcode = pano.gCode()
+        let gcode = Array(pano.gCode)
         let expected = [
             "M17 G1 G91 G92 A0 C0",
             "A0.00 C0.00 M114 M503", "M116 P10 Q115", "M240 P0.01 Q0 R0",
@@ -89,7 +89,7 @@ class PanoControllerTests: XCTestCase {
         pano.shutter = 1/100
         pano.preShutter = 0
         pano.postShutter = 0.5
-        let gcode = pano.gCode()
+        let gcode = Array(pano.gCode)
         let expected = [
             "M17 G1 G91 G92 A0 C0",
             "A0.00 C0.00 M114 M503", "M116 P10 Q2250", "M240 P0.01 Q0 R0.5",
