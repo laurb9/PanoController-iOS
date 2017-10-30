@@ -12,11 +12,7 @@
 import UIKit
 
 class MenuTableViewController: UITableViewController {
-    var panoPeripheral: PanoPeripheral?
-    var pano: Pano?
-    var menus: Menu?
-    @IBOutlet weak var deviceUILabel: UILabel!
-    @IBOutlet weak var panoUIBarButtonItem: UIBarButtonItem!
+    var menus: Menu!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,17 +25,10 @@ class MenuTableViewController: UITableViewController {
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
-        panoPeripheral?.delegate = self
-        if let pano = pano {
-            menus = getMenus(pano)
-        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
-        print("MenuTableViewControler: \(String(describing: panoPeripheral))")
-        panoPeripheral?.delegate = self
-        self.deviceUILabel.text = panoPeripheral?.name
-        panoUIBarButtonItem.isEnabled = panoPeripheral?.isReady ?? false
+        print("MenuTableViewControler: \(String(describing: menus))")
     }
 
     override func didReceiveMemoryWarning() {
@@ -93,41 +82,6 @@ class MenuTableViewController: UITableViewController {
         return cell
     }
 
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
     // MARK: - Save Settings
 
     @IBAction func rangeUpdated(_ sender: UISlider) {
@@ -163,35 +117,8 @@ class MenuTableViewController: UITableViewController {
             let indexPath = tableView.indexPath(for: listSelector) {
             destinationController.menuItem = menus![indexPath] as? ListSelector
             destinationController.title = destinationController.menuItem?.name
-        } else if let panoViewController = segue.destination as? PanoViewController {
-            panoViewController.panoPeripheral = panoPeripheral
-            panoViewController.pano = pano
-            panoPeripheral?.delegate = pano
+
         }
     }
 }
 
-// MARK: - PanoPeripheralDelegate
-
-extension MenuTableViewController : PanoPeripheralDelegate {
-    func panoPeripheralDidConnect(_ panoPeripheral: PanoPeripheral){
-        self.deviceUILabel.text = panoPeripheral.name
-        panoUIBarButtonItem.isEnabled = true
-    }
-    func panoPeripheralDidDisconnect(_ panoPeripheral: PanoPeripheral){
-        panoUIBarButtonItem.isEnabled = false
-        panoPeripheral.delegate = nil
-        performSegue(withIdentifier: "devices", sender: self)
-    }
-    func panoPeripheral(_ panoPeripheral: PanoPeripheral, didReceiveLine line: String) {
-        // FIXME: should send to pano
-    }
-    /* FIXME:
-    func panoPeripheral(_ panoPeripheral: PanoPeripheral, didReceiveStatus status: Status){
-        if panoPeripheral.status.running == 1 {
-            panoPeripheral.delegate = nil
-            performSegue(withIdentifier: "pano", sender: self)
-        }
-    }
-    */
-}

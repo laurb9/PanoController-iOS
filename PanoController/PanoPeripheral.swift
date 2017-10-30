@@ -11,7 +11,6 @@ import CoreBluetooth
 
 protocol PanoPeripheralDelegate {
     func panoPeripheralDidConnect(_ panoPeripheral: PanoPeripheral)
-    func panoPeripheralDidDisconnect(_ panoPeripheral: PanoPeripheral)
     func panoPeripheral(_ panoPeripheral: PanoPeripheral, didReceiveLine: String)
 }
 
@@ -124,10 +123,10 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate {
         sendDataOut()
     }
 
-    // MARK: -- UART Read-Write
+    // MARK: - UART Read-Write
 
     // Send a block of data from dataOut, emptying it when finished
-    func sendDataOut(){
+    private func sendDataOut(){
         let end = min(dataOutWriteOffset + blockSize, dataOut.count)
         if end > 0 {
             let buf = dataOut.subdata(in: dataOutWriteOffset..<end)
@@ -166,7 +165,7 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate {
         return line
     }
 
-    // MARK: -- CustomStringConvertible
+    // MARK: - CustomStringConvertible
 
     override var description: String {
         get {

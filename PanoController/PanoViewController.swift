@@ -1,4 +1,4 @@
-//
+	//
 //  PanoViewController.swift
 //  PanoController
 //
@@ -6,9 +6,10 @@
 //  Copyright © 2017 Laurentiu Badea. All rights reserved.
 //
 
+import CoreBluetooth
 import UIKit
 
-class PanoViewController: UIViewController, PanoPeripheralDelegate {
+class PanoViewController: UIViewController {
     @IBOutlet weak var nameUILabel: UILabel!
     @IBOutlet weak var identifierUILabel: UILabel!
     @IBOutlet weak var panoUIProgressView: UIProgressView!
@@ -32,51 +33,43 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
     @IBOutlet weak var horizUILabel: UILabel!
     @IBOutlet weak var vertUILabel: UILabel!
     @IBOutlet weak var padUIView: UIView!
+    @IBOutlet weak var connectUIButton: UIButton!
     var padViewController: PadViewController!
-    var pano: Pano?
-    var panoPeripheral: PanoPeripheral?
+    var bleManager: BLEManager!
+    var pano: Pano!
+    var menus: Menu!
 
     override func viewDidLoad() {
-        super.viewDidLoad()        // Do any additional setup after loading the view.
+        super.viewDidLoad()
+        bleManager = BLEManager(delegate: self)
+        pano = Pano()
+        menus = getMenus(pano)    // kind of doesn't belong here, but it loads the saved settings
+        pano.computeGrid()        // recalculate grid after loading saved settings
     }
 
     override func viewWillAppear(_ animated: Bool) {
-        print("PanoViewControler: \(String(describing: panoPeripheral))")
-        if let panoPeripheral = panoPeripheral,
-            let pano = pano {
-            panoPeripheral.delegate = self
-            pano.panoPeripheralDidConnect(panoPeripheral)
-            self.lensUILabel.text = "\(Int(pano.focalLength))"
-            self.shutterUILabel.text = pano.shutter >= 0.25 ? "\(pano.shutter)s" : "1/\(Int(1/pano.shutter))s"
-            self.horizUILabel.text = "\(pano.panoHorizFOV)"
-            self.vertUILabel.text = "\(pano.panoVertFOV)"
-            self.nameUILabel.text = panoPeripheral.name
-            self.identifierUILabel.text = panoPeripheral.peripheral?.identifier.uuidString
-            //self.signalUILabel.text = ...
-            updateStatus()
-        }
-        setButtonStates(start: true, pause: false, cancel: false)
+        print("PanoViewControler: \(String(describing: bleManager))")
+        bleManager.delegate = self
+        // These are updated in a different view so we don't need to render in updateStatus()
+        self.lensUILabel.text = "\(Int(pano.focalLength))"
+        self.shutterUILabel.text = pano.shutter >= 0.25 ? "\(pano.shutter)s" : "1/\(Int(1/pano.shutter))s"
+        self.horizUILabel.text = "\(pano.panoHorizFOV)"
+        self.vertUILabel.text = "\(pano.panoVertFOV)"
+        updateStatus()
     }
 
     func updateStatus() {
-        if let pano = pano {
-            batteryUILabel.text = String(format: "%.1fV", arguments:[Float(pano.platform["Battery", default: "0"])!])
-            motorsUILabel.text = Bool(pano.platform["MotorsEnabled"] ?? "false")! ? "⚡️" : "💤"
-            rowsUILabel.text = "\(pano.rows)"
-            colsUILabel.text = "\(pano.cols)"
-            if pano.cols > 0 {
-                currentRowUILabel.text = "\(pano.position / pano.cols + 1)"
-                currentColUILabel.text = "\(pano.position % pano.cols + 1)"
-                positionUILabel.text = "#\(pano.position + 1) of \(pano.rows * pano.cols)"
-                if pano.state == .Idle {
-                    panoUIProgressView.progress = 0.0
-                } else {
-                    panoUIProgressView.progress = Float(pano.position + 1) / Float(pano.rows * pano.cols)
-                }
+        if let panoPeripheral = bleManager.panoPeripheral {
+            self.nameUILabel.text = panoPeripheral.name
+            self.identifierUILabel.text = panoPeripheral.peripheral?.identifier.uuidString
+            if let battery = Float(pano.platform["Battery", default: ""]) {
+                batteryUILabel.text = String(format: "%.1fV", arguments:[battery])
             }
-            steadyDelayUILabel.text = String(format: "%.1fs", arguments:[Double(pano.platform["ZeroMotionWait", default: "0"])!])
-            horizOffsetUILabel.text = pano.platform["CurrentA", default: "0"]
-            vertOffsetUILabel.text = pano.platform["CurrentC", default: "0"]
+            if let steadyDelay = Float(pano.platform["ZeroMotionWait", default: ""]) {
+                steadyDelayUILabel.text = String(format: "%.1fs", arguments:[steadyDelay])
+            }
+            motorsUILabel.text = Bool(pano.platform["MotorsEnabled"] ?? "false")! ? "⚡️" : "💤"
+
             switch pano.state {
             case .Running:
                 statusUILabel.text = "▶️"
@@ -89,9 +82,33 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
                 statusUILabel.text = "⏹"
                 setButtonStates(start: true, pause: false, cancel: false)
             default:
-                statusUILabel.text = "🕸"
+                statusUILabel.text = " "
                 setButtonStates(start: padUIView.isHidden, pause: false, cancel: !padUIView.isHidden)
             }
+
+        } else {
+            nameUILabel.text = ""
+            identifierUILabel.text = "\(bleManager.peripherals.count) devices found"
+            batteryUILabel.text = ""
+            steadyDelayUILabel.text = ""
+            motorsUILabel.text = ""
+            statusUILabel.text = ""
+            setButtonStates(start: false, pause: false, cancel: false)
+        }
+
+        horizOffsetUILabel.text = pano.platform["CurrentA", default: "0"]
+        vertOffsetUILabel.text = pano.platform["CurrentC", default: "0"]
+        rowsUILabel.text = "\(pano.rows)"
+        colsUILabel.text = "\(pano.cols)"
+
+        currentRowUILabel.text = "\(pano.position / pano.cols + 1)"
+        currentColUILabel.text = "\(pano.position % pano.cols + 1)"
+        positionUILabel.text = "#\(pano.position + 1) of \(pano.rows * pano.cols)"
+
+        if pano.state == .Idle {
+            panoUIProgressView.progress = 0.0
+        } else {
+            panoUIProgressView.progress = Float(pano.position + 1) / Float(pano.rows * pano.cols)
         }
     }
 
@@ -108,10 +125,12 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
+
+    // MARK: - Button actions
+
     @IBAction func startPano(_ sender: UIButton) {
         showPadView(for: .freeMove)
-        if let pano = pano, let panoPeripheral = panoPeripheral {
+        if let panoPeripheral = bleManager.panoPeripheral {
             pano.state = .Idle
             pano.panoPeripheralDidConnect(panoPeripheral) // triggers updateStatus() on receive
         }
@@ -119,25 +138,28 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
     @IBAction func pausePano(_ sender: UIButton) {
         //FIXME: ???
         showPadView(for: .gridMove)
-        if let pano = pano, let panoPeripheral = panoPeripheral {
+        if let panoPeripheral = bleManager.panoPeripheral {
             pano.state = .Paused
             pano.panoPeripheralDidConnect(panoPeripheral) // triggers updateStatus() on receive
         }
     }
     @IBAction func cancelPano(_ sender: UIButton) {
         //FIXME: gcode, use Pano
-        panoPeripheral?.writeLine("G0 G28")
-        panoPeripheral?.writeLine("M18 M114 M503")
-        pano?.state = .End
+        bleManager.panoPeripheral?.writeLine("G0 G28")
+        bleManager.panoPeripheral?.writeLine("M18 M114 M503")
+        pano.state = .End
         hidePadView()
         setButtonStates(start: true, pause: false, cancel: false)
     }
+    @IBAction func connectButton(_ sender: UIButton) {
+    }
 
     func showPadView(for moveMode: MoveMode) {
+        padViewController.bleManager = bleManager
         padViewController.moveMode = moveMode
         if padUIView.isHidden {
             print("showing PadView in \(moveMode)")
-            self.panoPeripheral?.writeLine("M17 M503 M114") // FIXME: gcode, use Pano
+            bleManager.panoPeripheral?.writeLine("M17 M503 M114") // FIXME: gcode, use Pano
             padUIView.isHidden = false
             UIView.animate(withDuration: 0.5, animations: { self.padUIView.alpha = 1 })
         }
@@ -161,29 +183,73 @@ class PanoViewController: UIViewController, PanoPeripheralDelegate {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if let padViewController = segue.destination as? PadViewController {
             self.padViewController = padViewController
-            padViewController.panoPeripheral = panoPeripheral
+        } else if let menuTableViewController = segue.destination as? MenuTableViewController {
+            menuTableViewController.menus = menus
+        } else if let deviceTableViewController = segue.destination as? DeviceTableViewController {
+            deviceTableViewController.bleManager = bleManager
+            deviceTableViewController.delegate = self
         }
     }
 
-    @IBAction func unwindToStatus(sender: UIStoryboardSegue){
-        print("unwindToStatus from \(sender)")
-        hidePadView()
-        if let panoPeripheral = panoPeripheral,
-            let pano = pano,
-            pano.state == .End || pano.state == .Idle {
-            pano.startProgram(panoPeripheral)
+    @IBAction func unwindToPano(sender: UIStoryboardSegue){
+        print("unwindToPano from \(sender)")
+        if sender.source is PadViewController {
+            hidePadView()
+            if let panoPeripheral = bleManager.panoPeripheral,
+                pano.state == .End || pano.state == .Idle {
+                pano.startProgram(panoPeripheral)
+            }
+        } else if sender.source is DeviceTableViewController {
+            bleManager.delegate = self
         }
     }
+}
 
-    // MARK: - PanoPeripheralDelegate
+// MARK: - BLEManagerDelegate
 
+extension PanoViewController : BLEManagerDelegate {
+    func bleManager(_ ble: BLEManager, didConnect panoPeripheral: PanoPeripheral) {
+        panoPeripheral.delegate = self
+        pano.panoPeripheralDidConnect(panoPeripheral)
+        updateStatus()
+    }
+
+    func bleManager(_ ble: BLEManager, didDisconnect panoPeripheral: PanoPeripheral) {
+        pano.panoPeripheralDidDisconnect(panoPeripheral)
+        updateStatus()
+    }
+
+    func bleManager(_ ble: BLEManager, didDiscover peripheral: CBPeripheral) {
+    }
+
+    func bleManager(_ ble: BLEManager, didReceiveLine line: String) {
+    }
+}
+
+// MARK: - DeviceTableViewControllerDelegate
+
+extension PanoViewController : DeviceTableViewControllerDelegate {
+    func deviceTableViewController(_ deviceTableViewController: DeviceTableViewController, didConnect panoPeripheral: PanoPeripheral) {
+        panoPeripheral.delegate = self
+        pano.panoPeripheralDidConnect(panoPeripheral)
+    }
+
+    func deviceTableViewController(_ deviceTableViewController: DeviceTableViewController, didDisconnect panoPeripheral: PanoPeripheral) {
+        pano.panoPeripheralDidDisconnect(panoPeripheral)
+    }
+}
+
+// MARK: - PanoPeripheralDelegate
+
+extension PanoViewController : PanoPeripheralDelegate {
     func panoPeripheralDidConnect(_ panoPeripheral: PanoPeripheral){
     }
+
     func panoPeripheralDidDisconnect(_ panoPeripheral: PanoPeripheral){
-        performSegue(withIdentifier: "devices", sender: self)
     }
+
     func panoPeripheral(_ panoPeripheral: PanoPeripheral, didReceiveLine line: String) {
-        pano?.panoPeripheral(panoPeripheral, didReceiveLine: line)
+        pano.panoPeripheral(panoPeripheral, didReceiveLine: line)
         updateStatus()
     }
 }
