@@ -21,6 +21,7 @@ enum MenuItemKey {
     case shutterLong
     case shotCount
     case aspect
+    case infiniteRotation
 }
 
 protocol MenuItemDelegate {
@@ -222,6 +223,7 @@ func getMenus(_ delegate: MenuItemDelegate) -> Menu {
                 ]),
         ]),
         Menu("🛠 Advanced", delegate: delegate, entries: [
+            Switch("Infinite Rotation", delegate: delegate, key: .infiniteRotation, false),
             Switch("Motors", delegate: delegate, key: nil, false),
             ]),
     ])

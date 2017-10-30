@@ -71,6 +71,7 @@ class Pano : NSObject {
     var panoHorizFOV = 180.0   // 1-360°
     var panoVertFOV = 90.0    // 1-180°
     var overlap = 0.2          // 0 - 1 (representing 0% - 100%)
+    var infiniteRotation = false  // allow continuous horizontal rotation - no cables to tangle
 
     // State
     var position = 0
@@ -154,14 +155,16 @@ class Pano : NSObject {
 
         if (currentCol != col){
             // horizontal adjustment needed
-            // figure out shortest path around the circle
-            // FIXME: good idea if on batteries, bad idea when power cable in use
             horizMove = Double(col - currentCol) * horizCellMove;
-            if (abs(horizMove) > 180){
-                if (horizMove < 0){
-                    horizMove = 360 + horizMove;
-                } else {
-                    horizMove = horizMove - 360;
+            if (infiniteRotation){
+                // Use shortest path around the circle
+                // Good idea if on batteries, bad idea when power cable in use
+                if (abs(horizMove) > 180){
+                    if (horizMove < 0){
+                        horizMove = 360 + horizMove;
+                    } else {
+                        horizMove = horizMove - 360;
+                    }
                 }
             }
         }
@@ -240,6 +243,7 @@ extension Pano : PanoPeripheralDelegate {
         } else if state == .Running && line.starts(with: "ok") {
             // Received ack for previous command, send next one
             if let command = program?.next() {
+                print(command)
                 panoPeripheral.writeLine(command)
             } else {
                 // End of program
@@ -270,6 +274,7 @@ extension Pano: MenuItemDelegate {
             case 23: (self.sensorWidth, self.sensorHeight) = (24, 36)
             default: break
             }
+        case .infiniteRotation: self.infiniteRotation = value as! Bool
         }
         computeGrid()
     }
