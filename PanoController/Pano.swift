@@ -11,7 +11,7 @@ import Foundation
 extension String {
     func kvToDict() -> [String: String]? {
         let vals = self
-            .split(separator: " ")
+            .split(separator: "\t")
             .flatMap { (s) -> (String, String)? in
                 let kv = s.split(separator: "=", maxSplits: 1)
                 if kv.count == 2 {
@@ -66,6 +66,7 @@ class Pano : NSObject {
     var shutter = 0.1          // s
     var preShutter = 0.0       // s
     var postShutter = 0.0      // s
+    var zeroMotionWait = 0.0   // s
     var shutterLong = false
     var shotCount = 1
     var panoHorizFOV = 180.0   // 1-360°
@@ -90,7 +91,6 @@ class Pano : NSObject {
     // While harder on the eyes, this allows in-flight changing parameters like position, for example
     var gCode: AnyIterator<String> {
         computeGrid()
-        let steadyTarget = Pano.steadyTarget(for: sensorHeight, at: focalLength, resolution: 4000, shutter: shutter)
         var commandBuffer = ["M17 G1 G91 G92 A0 C0"].makeIterator()
         self.position = 0
         var targetPosition = 0  // moveTo() keeps track of the previous position to calculate offsets, so we cannot modify it directly
@@ -109,8 +109,11 @@ class Pano : NSObject {
                     if (self.preShutter > 0){
                         commands.append("G4 P\(self.preShutter.format())")
                     }
-                    commands.append("M116 P10 Q\(steadyTarget.format(0))")
-                    if (self.shutter > 0){
+                    if self.zeroMotionWait > 0 && self.shutter > 0 {
+                        let steadyTarget = Pano.steadyTarget(for: self.sensorHeight, at: self.focalLength, resolution: 4000, shutter: self.shutter)
+                        commands.append("M116 P\(self.zeroMotionWait.format(1)) Q\(steadyTarget.format(0))")
+                    }
+                    if self.shutter > 0 {
                         for _ in 0..<self.shotCount {
                             commands.append("M240 P\(self.shutter.format()) Q\(self.shutterLong ? 1 : 0) R\(self.postShutter.format())")
                         }
@@ -275,6 +278,7 @@ extension Pano: MenuItemDelegate {
             default: break
             }
         case .infiniteRotation: self.infiniteRotation = value as! Bool
+        case .zeroMotionWait: self.zeroMotionWait = value as! Double
         }
         computeGrid()
     }

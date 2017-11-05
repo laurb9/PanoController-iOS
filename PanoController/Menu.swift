@@ -22,6 +22,7 @@ enum MenuItemKey {
     case shotCount
     case aspect
     case infiniteRotation
+    case zeroMotionWait
 }
 
 protocol MenuItemDelegate {
@@ -189,6 +190,7 @@ func getMenus(_ delegate: MenuItemDelegate) -> Menu {
                 Option("BULB", 0),
                 ]),
             ListSelector("Pre-Shot Delay", delegate: delegate, key: .preShutter, options: [
+                Option("None", 0.0),
                 Option("0.1s", 0.1, isDefault: true),
                 Option("0.25s", 0.25),
                 Option("0.5s", 0.5),
@@ -198,6 +200,7 @@ func getMenus(_ delegate: MenuItemDelegate) -> Menu {
                 Option("8s", 8.0),
                 ]),
             ListSelector("Post-Shot Delay", delegate: delegate, key: .postShutter, options: [
+                Option("None", 0.0),
                 Option("0.1s", 0.1, isDefault: true),
                 Option("0.25s", 0.25),
                 Option("0.5s", 0.5),
@@ -223,6 +226,13 @@ func getMenus(_ delegate: MenuItemDelegate) -> Menu {
                 ]),
         ]),
         Menu("🛠 Advanced", delegate: delegate, entries: [
+            ListSelector("Zero Motion Wait", delegate: delegate, key: .zeroMotionWait, options: [
+                Option("Disabled", 0.0),
+                Option("1s", 1.0),
+                Option("5s", 5.0),
+                Option("10s", 10.0, isDefault: true),
+                Option("30s", 30.0),
+                ]),
             Switch("Infinite Rotation", delegate: delegate, key: .infiniteRotation, false),
             Switch("Motors", delegate: delegate, key: nil, false),
             ]),
