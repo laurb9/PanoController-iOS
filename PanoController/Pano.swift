@@ -91,7 +91,10 @@ class Pano : NSObject {
     // While harder on the eyes, this allows in-flight changing parameters like position, for example
     var gCode: AnyIterator<String> {
         computeGrid()
-        var commandBuffer = ["M17 G1 G91 G92 A0 C0"].makeIterator()
+        var commandBuffer = ["M17 M320 G1 G91 G92 A0 C0",
+                             "M203 A\(platform["MaxSpeedA"]!) C\(platform["MaxSpeedC"]!)",
+                             "M202 A\(platform["MaxAccelC"]!) C\(platform["MaxAccelC"]!)",
+                             "M503"].makeIterator()
         self.position = 0
         var targetPosition = 0  // moveTo() keeps track of the previous position to calculate offsets, so we cannot modify it directly
         return AnyIterator<String> {
@@ -104,18 +107,19 @@ class Pano : NSObject {
                 var commands: [String] = []
                 if targetPosition < self.rows * self.cols {
                     // Actual program
+                    commands.append(";\(targetPosition+1)/\(self.rows*self.cols)")
                     let (horizMove, vertMove) = self.moveTo(to: targetPosition)
-                    commands.append("A\(horizMove.format(2)) C\(vertMove.format(2)) M114 M503")
+                    commands.append("A\(horizMove.format(2)) C\(vertMove.format(2)) M114 M503 P2")
                     if (self.preShutter > 0){
-                        commands.append("G4 P\(self.preShutter.format())")
+                        commands.append("G4 S\(self.preShutter.format())")
                     }
                     if self.zeroMotionWait > 0 && self.shutter > 0 {
                         let steadyTarget = Pano.steadyTarget(for: self.sensorHeight, at: self.focalLength, resolution: 4000, shutter: self.shutter)
-                        commands.append("M116 P\(self.zeroMotionWait.format(1)) Q\(steadyTarget.format(0))")
+                        commands.append("M116 S\(self.zeroMotionWait.format(1)) Q\(steadyTarget.format(3))")
                     }
                     if self.shutter > 0 {
                         for _ in 0..<self.shotCount {
-                            commands.append("M240 P\(self.shutter.format()) Q\(self.shutterLong ? 1 : 0) R\(self.postShutter.format())")
+                            commands.append("M240 S\(self.shutter.format()) Q\(self.shutterLong ? 1 : 0) R\(self.postShutter.format())")
                         }
                     } else {
                         commands.append("M0")
@@ -215,9 +219,9 @@ class Pano : NSObject {
         return 360.0 * atan(sensorSize / 2.0 / focalLength) / Double.pi
     }
 
-    // Calculate max angular velocity [0.001°/s] for this shutter, focal length and sensor size
+    // Calculate max angular velocity [°/s] for this shutter, focal length and sensor size
     static func steadyTarget(for sensorSize: Double, at focalLength: Double, resolution: Int, shutter: Double) -> Double {
-        return 1000 * lensFOV(for: sensorSize, at: focalLength) / Double(resolution) / shutter
+        return lensFOV(for: sensorSize, at: focalLength) / Double(resolution) / shutter
     }
 
     // Start sending/executing the generated gCode
@@ -233,7 +237,7 @@ class Pano : NSObject {
 extension Pano : PanoPeripheralDelegate {
     func panoPeripheralDidConnect(_ panoPeripheral: PanoPeripheral){
         // Request firmware and configuration info on connect
-        panoPeripheral.writeLine("M115 M503 M117 M114")
+        panoPeripheral.writeLine("M115 M117 M114 M503 P7")
     }
 
     func panoPeripheralDidDisconnect(_ panoPeripheral: PanoPeripheral){

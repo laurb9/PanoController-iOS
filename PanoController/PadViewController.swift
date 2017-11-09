@@ -47,7 +47,7 @@ class PadViewController: UIViewController {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) {
             (timer: Timer) in
-            self.bleManager.panoPeripheral?.writeLine("A\(horizontal) C\(vertical) M114") // FIXME: gcode, use Pano and disable accel
+            self.bleManager.panoPeripheral?.writeLine("A\(horizontal*2) C\(vertical*2) M114") // FIXME: gcode, use Pano and disable accel
         }
     }
     func stopFreeMove(){

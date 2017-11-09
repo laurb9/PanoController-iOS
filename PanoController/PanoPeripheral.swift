@@ -105,6 +105,7 @@ class PanoPeripheral : NSObject, CBPeripheralDelegate {
             //let s = String(data: characteristic.value!, encoding: .ascii)
             //print("Received \(s)")
             while let line = readLine() {
+                print(">>> \(line)")
                 delegate?.panoPeripheral(self, didReceiveLine: line)
             }
 

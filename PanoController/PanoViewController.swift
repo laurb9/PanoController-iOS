@@ -52,7 +52,7 @@ class PanoViewController: UIViewController {
         bleManager.delegate = self
         // These are updated in a different view so we don't need to render in updateStatus()
         self.lensUILabel.text = "\(Int(pano.focalLength))"
-        self.shutterUILabel.text = pano.shutter >= 0.25 ? "\(pano.shutter)s" : "1/\(Int(1/pano.shutter))s"
+        self.shutterUILabel.text = pano.shutter >= 0.5 ? "\(pano.shutter)s" : "1/\(Int(1/pano.shutter))s"
         self.horizUILabel.text = "\(pano.panoHorizFOV)"
         self.vertUILabel.text = "\(pano.panoVertFOV)"
         updateStatus()
@@ -60,8 +60,8 @@ class PanoViewController: UIViewController {
 
     func updateStatus() {
         if let panoPeripheral = bleManager.panoPeripheral {
-            self.nameUILabel.text = panoPeripheral.name
-            self.identifierUILabel.text = panoPeripheral.peripheral?.identifier.uuidString
+            self.nameUILabel.text = pano.platform["Name", default: panoPeripheral.name] + " " + pano.platform["Version", default: ""]
+            self.identifierUILabel.text = pano.platform["Build", default: panoPeripheral.peripheral?.identifier.uuidString ?? ""]
             if let battery = Float(pano.platform["Battery", default: ""]) {
                 batteryUILabel.text = String(format: "%.1fV", arguments:[battery])
             }
@@ -159,7 +159,7 @@ class PanoViewController: UIViewController {
         padViewController.moveMode = moveMode
         if padUIView.isHidden {
             print("showing PadView in \(moveMode)")
-            bleManager.panoPeripheral?.writeLine("M17 M503 M114") // FIXME: gcode, use Pano
+            bleManager.panoPeripheral?.writeLine("M17 G1 G91 M503 M114 M203 A10 C10 M321") // FIXME: gcode, use Pano
             padUIView.isHidden = false
             UIView.animate(withDuration: 0.5, animations: { self.padUIView.alpha = 1 })
         }
