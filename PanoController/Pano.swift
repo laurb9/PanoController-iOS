@@ -94,7 +94,7 @@ class Pano : NSObject {
         computeGrid()
         var commandBuffer = ["M17 M320 G1 G91 G92 A0 C0",
                              "M203 A\(platform["MaxSpeedA"]!) C\(platform["MaxSpeedC"]!)",
-                             "M202 A\(28*Double(platform["MaxAccelC"]!)!/focalLength) C\(28*Double(platform["MaxAccelC"]!)!/focalLength)",
+                             "M202 A\(18*Double(platform["MaxAccelA"]!)!/focalLength) C\(18*Double(platform["MaxAccelC"]!)!/focalLength)",
                              "M503"].makeIterator()
         self.position = 0
         var targetPosition = 0  // moveTo() keeps track of the previous position to calculate offsets, so we cannot modify it directly
