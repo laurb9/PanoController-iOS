@@ -73,6 +73,7 @@ class Pano : NSObject {
     var panoVertFOV = 90.0    // 1-180°
     var overlap = 0.2          // 0 - 1 (representing 0% - 100%)
     var infiniteRotation = false  // allow continuous horizontal rotation - no cables to tangle
+    var stabilizationStops = 0.0  // how many stops of IS we should count on
 
     // State
     var position = 0
@@ -114,7 +115,7 @@ class Pano : NSObject {
                         commands.append("G4 S\(self.preShutter.format())")
                     }
                     if self.zeroMotionWait > 0 && self.shutter > 0 {
-                        let steadyTarget = Pano.steadyTarget(for: self.sensorHeight, at: self.focalLength, resolution: 4000, shutter: self.shutter)
+                        let steadyTarget = Pano.steadyTarget(for: self.sensorHeight, at: self.focalLength, resolution: 4000, shutter: self.shutter, stops: self.stabilizationStops)
                         commands.append("M116 S\(self.zeroMotionWait.format(1)) Q\(steadyTarget.format(3))")
                     }
                     if self.shutter > 0 {
@@ -220,8 +221,8 @@ class Pano : NSObject {
     }
 
     // Calculate max angular velocity [°/s] for this shutter, focal length and sensor size
-    static func steadyTarget(for sensorSize: Double, at focalLength: Double, resolution: Int, shutter: Double) -> Double {
-        return lensFOV(for: sensorSize, at: focalLength) / Double(resolution) / shutter
+    static func steadyTarget(for sensorSize: Double, at focalLength: Double, resolution: Int, shutter: Double, stops: Double = 0) -> Double {
+        return lensFOV(for: sensorSize, at: focalLength) / Double(resolution) / shutter * pow(2.0, stops)
     }
 
     // Start sending/executing the generated gCode
@@ -283,6 +284,7 @@ extension Pano: MenuItemDelegate {
             }
         case .infiniteRotation: self.infiniteRotation = value as! Bool
         case .zeroMotionWait: self.zeroMotionWait = value as! Double
+        case .stabilized: self.stabilizationStops = value as! Bool ? 2 : 0;
         }
         computeGrid()
     }

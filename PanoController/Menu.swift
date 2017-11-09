@@ -23,6 +23,7 @@ enum MenuItemKey {
     case aspect
     case infiniteRotation
     case zeroMotionWait
+    case stabilized
 }
 
 protocol MenuItemDelegate {
@@ -224,6 +225,7 @@ func getMenus(_ delegate: MenuItemDelegate) -> Menu {
                 Option("Portrait 2:3", 23),
                 Option("Landscape 3:2", 32, isDefault: true),
                 ]),
+            Switch("Image Stabilization", delegate: delegate, key: .stabilized, false),
         ]),
         Menu("🛠 Advanced", delegate: delegate, entries: [
             ListSelector("Zero Motion Wait", delegate: delegate, key: .zeroMotionWait, options: [
