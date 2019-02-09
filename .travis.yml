@@ -1,0 +1,8 @@
+language: objective-c
+os: osx
+osx_image: xcode9.4
+xcode_project: PanoController.xcodeproj
+xcode_scheme: PanoController
+xcode_destination: platform=iOS Simulator,OS=11.4,name=iPhone 7 Plus
+git:
+  depth: false

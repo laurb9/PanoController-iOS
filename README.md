@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/laurb9/PanoController-iOS.svg?branch=master)](https://travis-ci.com/laurb9/PanoController-iOS)
+
 # PanoController-iOS
 
 iOS PanoController App 1.0
