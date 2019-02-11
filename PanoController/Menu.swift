@@ -11,11 +11,30 @@
 
 import Foundation
 
+enum MenuItemKey {
+    case horizFOV
+    case vertFOV
+    case focalLength
+    case shutter
+    case preShutter
+    case postShutter
+    case shutterLong
+    case shotCount
+    case aspect
+    case infiniteRotation
+    case zeroMotionWait
+    case stabilized
+}
+
+protocol MenuItemDelegate {
+    func menuItem(didSet index: MenuItemKey, value: Any)
+}
+
 class Option: NSObject {
     let name: String
-    let value: Int16
+    let value: Any
     let isDefault: Bool
-    init(_ name: String, _ value: Int16, isDefault: Bool = false){
+    init(_ name: String, _ value: Any, isDefault: Bool = false){
         self.name = name
         self.value = value
         self.isDefault = isDefault
@@ -24,11 +43,11 @@ class Option: NSObject {
 
 class MenuItem: NSObject {
     let name: String
-    let config: Config
-    let key: String?
-    init(_ name: String, using config: Config, key: String? = nil){
+    let key: MenuItemKey?
+    let delegate: MenuItemDelegate?
+    init(_ name: String, delegate: MenuItemDelegate? = nil, key: MenuItemKey? = nil){
         self.name = name
-        self.config = config
+        self.delegate = delegate
         self.key = key
     }
 }
@@ -42,11 +61,11 @@ class ListSelector: MenuItem {
         didSet {
             UserDefaults.standard.set(current, forKey: name)
             if let index = key {
-                config[index] = options[current].value
+                delegate?.menuItem(didSet: index, value: options[current].value)
             }
         }
     }
-    init(_ name: String, using config: Config, key: String?, options: [Option]){
+    init(_ name: String, delegate: MenuItemDelegate? = nil, key: MenuItemKey?, options: [Option]){
         self.options = options
         if let savedCurrent = UserDefaults.standard.object(forKey: name) as? Int {
             current = savedCurrent
@@ -58,9 +77,9 @@ class ListSelector: MenuItem {
                 }
             }
         }
-        super.init(name, using: config, key: key)
+        super.init(name, delegate: delegate, key: key)
         if let index = key {
-            config[index] = options[current].value
+            delegate?.menuItem(didSet: index, value: options[current].value)
         }
     }
     func currentOptionName() -> String {
@@ -72,23 +91,23 @@ class ListSelector: MenuItem {
 }
 
 class RangeSelector: MenuItem {
-    let min: Int16
-    let max: Int16
-    var current: Int16 {
+    let min: Int
+    let max: Int
+    var current: Int {
         didSet {
             UserDefaults.standard.set(current, forKey: name)
             if let index = key {
-                config[index] = current
+                delegate?.menuItem(didSet: index, value: current)
             }
         }
     }
-    init(_ name: String, using config: Config, key: String?, min: Int16, max: Int16, defaultValue: Int16){
+    init(_ name: String, delegate: MenuItemDelegate? = nil, key: MenuItemKey?, min: Int, max: Int, defaultValue: Int){
         self.min = min
         self.max = max
-        current = UserDefaults.standard.object(forKey: name) as? Int16 ?? defaultValue
-        super.init(name, using: config, key: key)
+        current = UserDefaults.standard.object(forKey: name) as? Int ?? defaultValue
+        super.init(name, delegate: delegate, key: key)
         if let index = key {
-            config[index] = current
+            delegate?.menuItem(didSet: index, value: current)
         }
     }
 }
@@ -98,16 +117,16 @@ class Switch: MenuItem {
         didSet {
             UserDefaults.standard.set(currentState, forKey: name)
             if let index = key {
-                config[index] = currentState ? 1 : 0
+                delegate?.menuItem(didSet: index, value: currentState)
             }
         }
     }
-    init(_ name: String, using config: Config, key: String?, _ defaultState: Bool){
+    init(_ name: String, delegate: MenuItemDelegate? = nil, key: MenuItemKey?, _ defaultState: Bool){
         currentState = UserDefaults.standard.object(forKey: name) as? Bool ?? defaultState
         self.currentState = defaultState
-        super.init(name, using: config, key: key)
+        super.init(name, delegate: delegate, key: key)
         if let index = key {
-            config[index] = currentState ? 1 : 0
+            delegate?.menuItem(didSet: index, value: currentState)
         }
     }
 }
@@ -117,9 +136,9 @@ class Menu: MenuItem {
     var count: Int {
         return entries.count
     }
-    init(_ name: String, using config: Config, entries: [MenuItem]){
+    init(_ name: String, delegate: MenuItemDelegate? = nil, entries: [MenuItem]){
         self.entries = entries
-        super.init(name, using: config)
+        super.init(name, delegate: delegate)
     }
 
     subscript(index: Int) -> MenuItem {
@@ -130,14 +149,14 @@ class Menu: MenuItem {
     }
 }
 
-func getMenus(_ config: Config) -> Menu {
-    let menus = Menu("Configuration", using: config, entries: [
-        Menu("🌄 Pano", using: config, entries: [
-            RangeSelector("Horizontal FOV", using: config, key: "horiz", min: 5, max: 360, defaultValue: 120),
-            RangeSelector("Vertical FOV", using: config, key: "vert", min: 5, max: 180, defaultValue: 90),
+func getMenus(_ delegate: MenuItemDelegate) -> Menu {
+    let menus = Menu("Configuration", delegate: delegate, entries: [
+        Menu("🌄 Pano", delegate: delegate, entries: [
+            RangeSelector("Horizontal FOV", delegate: delegate, key: .horizFOV, min: 5, max: 360, defaultValue: 120),
+            RangeSelector("Vertical FOV", delegate: delegate, key: .vertFOV, min: 5, max: 180, defaultValue: 90),
             ]),
-        Menu("📷️ Camera", using: config, entries: [
-            ListSelector("Focal Length", using: config, key: "focal", options: [
+        Menu("📷️ Camera", delegate: delegate, entries: [
+            ListSelector("Focal Length", delegate: delegate, key: .focalLength, options: [
                 Option("12mm", 12),
                 Option("14mm", 14),
                 Option("16mm", 16),
@@ -155,58 +174,69 @@ func getMenus(_ config: Config) -> Menu {
                 Option("500mm", 500),
                 Option("600mm", 600),
                 ]),
-            ListSelector("Shutter", using: config, key: "shutter", options: [
-                Option("1/1000s", 1),
-                Option("1/500s", 2),
-                Option("1/250s", 4),
-                Option("1/100s", 10, isDefault: true),
-                Option("1/50s", 20),
-                Option("1/25s", 40),
-                Option("1/10s", 100),
-                Option("1/4s", 250),
-                Option("0.5s", 500),
-                Option("1s", 1000),
-                Option("2s", 2000),
-                Option("4s", 4000),
-                Option("8s", 8000),
+            ListSelector("Shutter", delegate: delegate, key: .shutter, options: [
+                Option("1/1000s", 1.0/1000),
+                Option("1/500s", 1.0/500),
+                Option("1/250s", 1.0/250),
+                Option("1/100s", 1.0/100, isDefault: true),
+                Option("1/50s", 1.0/50),
+                Option("1/25s", 1.0/25),
+                Option("1/10s", 1.0/10),
+                Option("1/4s", 1.0/4),
+                Option("0.5s", 0.5),
+                Option("1s", 1.0),
+                Option("2s", 2.0),
+                Option("4s", 4.0),
+                Option("8s", 8.0),
                 Option("BULB", 0),
                 ]),
-            ListSelector("Delay", using: config, key: "pre_shutter", options: [
-                Option("0.1s", 100, isDefault: true),
-                Option("0.25s", 250),
-                Option("0.5s", 500),
-                Option("1s", 1000),
-                Option("2s", 2000),
-                Option("4s", 4000),
-                Option("8s", 8000),
+            ListSelector("Pre-Shot Delay", delegate: delegate, key: .preShutter, options: [
+                Option("None", 0.0),
+                Option("0.1s", 0.1, isDefault: true),
+                Option("0.25s", 0.25),
+                Option("0.5s", 0.5),
+                Option("1s", 1.0),
+                Option("2s", 2.0),
+                Option("4s", 4.0),
+                Option("8s", 8.0),
                 ]),
-            ListSelector("Processing Wait", using: config, key: "post_wait", options: [
-                Option("0.1s", 100, isDefault: true),
-                Option("0.25s", 250),
-                Option("0.5s", 500),
-                Option("1s", 1000),
-                Option("2s", 2000),
-                Option("4s", 4000),
-                Option("8s", 8000),
+            ListSelector("Post-Shot Delay", delegate: delegate, key: .postShutter, options: [
+                Option("None", 0.0),
+                Option("0.1s", 0.1, isDefault: true),
+                Option("0.25s", 0.25),
+                Option("0.5s", 0.5),
+                Option("1s", 1.0),
+                Option("2s", 2.0),
+                Option("4s", 4.0),
+                Option("8s", 8.0),
                 ]),
-            ListSelector("Shutter Mode", using: config, key: "long_pulse", options: [
-                Option("Normal (Short)", 0, isDefault: true),
-                Option("Cont Bracket (Long)", 1),
+            ListSelector("Shutter Mode", delegate: delegate, key: .shutterLong, options: [
+                Option("Normal (Short)", false, isDefault: true),
+                Option("Cont Bracket (Long)", true),
                 ]),
-            ListSelector("Shots #", using: config, key: "shots", options: [
+            ListSelector("Shots #", delegate: delegate, key: .shotCount, options: [
                 Option("1", 1, isDefault: true),
                 Option("2", 2),
                 Option("3", 3),
                 Option("4", 4),
                 Option("5", 5),
                 ]),
-            ListSelector("Aspect Ratio", using: config, key: "aspect", options: [
+            ListSelector("Aspect Ratio", delegate: delegate, key: .aspect, options: [
                 Option("Portrait 2:3", 23),
                 Option("Landscape 3:2", 32, isDefault: true),
                 ]),
+            Switch("Image Stabilization", delegate: delegate, key: .stabilized, false),
         ]),
-        Menu("🛠 Advanced", using: config, entries: [
-            Switch("Motors", using: config, key: "motors_on", true),
+        Menu("🛠 Advanced", delegate: delegate, entries: [
+            ListSelector("Zero Motion Wait", delegate: delegate, key: .zeroMotionWait, options: [
+                Option("Disabled", 0.0),
+                Option("1s", 1.0),
+                Option("5s", 5.0),
+                Option("10s", 10.0, isDefault: true),
+                Option("30s", 30.0),
+                ]),
+            Switch("Infinite Rotation", delegate: delegate, key: .infiniteRotation, false),
+            Switch("Motors", delegate: delegate, key: nil, false),
             ]),
     ])
     return menus

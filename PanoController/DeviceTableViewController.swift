@@ -12,36 +12,28 @@
 import CoreBluetooth
 import UIKit
 
-class DeviceTableViewController: UITableViewController, CBCentralManagerDelegate, PanoPeripheralDelegate {
-    var bleManager: CBCentralManager!
-    var peripheral: CBPeripheral?
-    var panoPeripheral: PanoPeripheral?
-    var peripherals: [CBPeripheral] = []
+protocol DeviceTableViewControllerDelegate {
+    func deviceTableViewController(_ deviceTableViewController: DeviceTableViewController, didConnect panoPeripheral: PanoPeripheral)
+    func deviceTableViewController(_ deviceTableViewController: DeviceTableViewController, didDisconnect panoPeripheral: PanoPeripheral)
+}
+
+class DeviceTableViewController: UITableViewController {
+    var bleManager: BLEManager!
+    var delegate: DeviceTableViewControllerDelegate?
     @IBOutlet weak var navTitle: UINavigationItem!
-    @IBOutlet weak var settingsUIBarButtonItem: UIBarButtonItem!
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem()
-
-        bleManager = CBCentralManager(delegate: self, queue: DispatchQueue.main)
     }
 
     override func viewWillAppear(_ animated: Bool) {
-        print("DeviceTableViewControler: \(String(describing: panoPeripheral))")
-        panoPeripheral?.delegate = self
-        settingsUIBarButtonItem.isEnabled = panoPeripheral?.isReady ?? false
+        print("DeviceTableViewControler: \(String(describing: bleManager))")
+        bleManager.delegate = self
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
-        peripherals.removeAll(keepingCapacity: false)
     }
 
     // MARK: - Table view data source
@@ -51,182 +43,60 @@ class DeviceTableViewController: UITableViewController, CBCentralManagerDelegate
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return peripherals.count
+        return bleManager.peripherals.count
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "BTPeripheral", for: indexPath) as! DeviceTableViewCell
-        let thisPeripheral = peripherals[indexPath.row]
+        let thisPeripheral = bleManager.peripherals[indexPath.row]
         cell.tag = indexPath.row
         cell.connectingView.isHidden = true
         cell.nameView.text = "\(thisPeripheral.name ?? "(no name)")\n\(thisPeripheral.identifier)"
-        if thisPeripheral.identifier == peripheral?.identifier {
-            if peripheral?.state == .connected {
-                cell.connectingView.stopAnimating()
-                cell.accessoryType = .checkmark
-                if panoPeripheral?.peripheral == nil {
-                    cell.nameView.text! += "\n(identifying)"
-                } else if panoPeripheral?.peripheral == thisPeripheral {
-                    if (panoPeripheral?.status.running == 1){
-                        cell.nameView.text! += "\nStatus: running, at photo \(panoPeripheral!.status.position+1), battery \(Float(abs(panoPeripheral!.status.battery))/1000.0)V"
-                    } else {
-                        cell.nameView.text! += "\nStatus: ready"
-                    }
-                }
-            } else {
-                cell.connectingView.startAnimating()
-                cell.nameView.text! += "\n(connecting)"
-            }
+        if bleManager.isConnecting(to: thisPeripheral){
+            cell.connectingView.startAnimating()
+            cell.nameView.text! += "\n(connecting)"
+        } else if bleManager.isConnected(to: thisPeripheral){
+            cell.connectingView.stopAnimating()
+            cell.accessoryType = .checkmark
         } else {
             cell.accessoryType = .none
         }
         return cell
     }
 
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let targetPeripheral = peripherals[indexPath.row]
-        if targetPeripheral.state == .connected ||
-            targetPeripheral.identifier == peripheral?.identifier {
+        let targetPeripheral = bleManager.peripherals[indexPath.row]
+        if bleManager.isConnected(to: targetPeripheral) {
             // previously connected, disconnect
-            bleManager.cancelPeripheralConnection(targetPeripheral)
-            peripheral = nil
+            bleManager.disconnect()
         } else {
             print("Connecting to \(targetPeripheral.name!) id \(targetPeripheral.identifier)")
-            bleManager.stopScan()
-            self.peripheral = targetPeripheral
-            bleManager.connect(targetPeripheral, options: nil)
+            bleManager.connect(targetPeripheral)
             tableView.reloadRows(at: [indexPath], with: .none)
         }
     }
 
     // MARK: - Navigation
+}
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-        if let menuTableViewController = segue.destination as? MenuTableViewController {
-            menuTableViewController.panoPeripheral = panoPeripheral
-        }
-    }
+// MARK: - BLEManagerDelegate
 
-    @IBAction func unwindToDevices(sender: UIStoryboardSegue){
-        //if let _ = sender.source as? OptionViewController,
-        //}
-    }
-
-    // MARK: - CentralManagerDelegate
-
-    func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        switch central.state {
-        case .poweredOn:
-            central.scanForPeripherals(withServices: nil, options: nil)
-        default:
-            print("Bluetooth unavailable")
-            peripherals.removeAll(keepingCapacity: false)
-            tableView.reloadData()
-        }
-    }
-
-    func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
-        let capabilities = (advertisementData as NSDictionary)
-        if peripheral.name != nil && peripheral.name != "" && peripheral.state == .disconnected &&
-            // check if this device wasn't added already
-            peripherals.filter({$0.identifier == peripheral.identifier}).count == 0 &&
-            // and that we can connect to it
-            capabilities.object(forKey: CBAdvertisementDataIsConnectable) as? Bool ?? false,
-            let dataServices = capabilities.object(forKey: CBAdvertisementDataServiceUUIDsKey) as? NSArray,
-            // We are only looking for devices that have the PanoController Service
-            dataServices.contains(PanoPeripheral.serviceUUID) {
-
-            print("New peripheral \(peripheral) \(RSSI)")
-            print(capabilities.description)
-            peripherals.append(peripheral)
-            tableView.reloadData()
-
-            // autoconnect to the last peripheral used if seen
-            if let lastPeripheralUUID = UserDefaults.standard.object(forKey: "lastPeripheralUUID") as? String,
-                peripheral.identifier.uuidString == lastPeripheralUUID {
-                self.peripheral = peripheral
-                bleManager.connect(peripheral, options: nil)
-                tableView.reloadRows(at: [IndexPath(row: peripherals.count-1, section: 0)], with: .none)
-            }
-        }
-    }
-
-    func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-        print("didConnect \(peripheral.name!)")
-        panoPeripheral = PanoPeripheral(peripheral, delegate: self)
+extension DeviceTableViewController : BLEManagerDelegate {
+    func bleManager(_ ble: BLEManager, didDiscover peripheral: CBPeripheral) {
         tableView.reloadData()
     }
 
-    func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
-        print("didFailToConnect: \(String(describing: error))")
-        self.peripheral = nil
-        panoPeripheral = nil
-        central.scanForPeripherals(withServices: nil, options: nil)
+    func bleManager(_ ble: BLEManager, didConnect panoPeripheral: PanoPeripheral) {
+        delegate?.deviceTableViewController(self, didConnect: panoPeripheral)
+        tableView.reloadData()
+        performSegue(withIdentifier: "back", sender: self)
     }
 
-    func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
-        print("didDisconnectPeripheral: \(peripheral.name!)")
-        self.peripheral = nil
-        if let p = panoPeripheral {
-            p.delegate?.panoPeripheralDidDisconnect(p)
-            panoPeripheral = nil
-        }
-        central.scanForPeripherals(withServices: nil, options: nil)
+    func bleManager(_ ble: BLEManager, didDisconnect panoPeripheral: PanoPeripheral) {
+        delegate?.deviceTableViewController(self, didDisconnect: panoPeripheral)
         tableView.reloadData()
     }
 
-    // MARK: - PanoPeripheralDelegate
-
-    func panoPeripheralDidConnect(_ panoPeripheral: PanoPeripheral){
-        panoPeripheral.delegate = nil  // avoid triggering the segue multiple times
-        UserDefaults.standard.set(panoPeripheral.peripheral?.identifier.uuidString, forKey: "lastPeripheralUUID")
-        if panoPeripheral.status.running == 1 {
-            performSegue(withIdentifier: "pano", sender: self)
-        } else {
-            performSegue(withIdentifier: "settings", sender: self)
-        }
-    }
-    func panoPeripheralDidDisconnect(_ panoPeripheral: PanoPeripheral){
-    }
-    func panoPeripheral(_ panoPeripheral: PanoPeripheral, didReceiveStatus status: Status){
-        tableView.reloadData() // too lazy
+    func bleManager(_ ble: BLEManager, didReceiveLine line: String) {
     }
 }

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D33A74931F94813A005CCAC9 /* Pano.swift in Sources */ = {isa = PBXBuildFile; fileRef = D33A74921F94813A005CCAC9 /* Pano.swift */; };
 		D395703C1F2EC01900388325 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D395703B1F2EC01900388325 /* AppDelegate.swift */; };
 		D39570411F2EC01900388325 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D395703F1F2EC01900388325 /* Main.storyboard */; };
 		D39570441F2EC01900388325 /* PanoController.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = D39570421F2EC01900388325 /* PanoController.xcdatamodeld */; };
@@ -19,9 +20,9 @@
 		D39570671F32F34F00388325 /* ToggleTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D39570661F32F34F00388325 /* ToggleTableViewCell.swift */; };
 		D39570691F32F38500388325 /* SelectTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D39570681F32F38500388325 /* SelectTableViewCell.swift */; };
 		D395706B1F32FE4600388325 /* RangeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D395706A1F32FE4600388325 /* RangeTableViewCell.swift */; };
+		D3A4FDC01FA653E800A0FB0E /* BLEManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3A4FDBF1FA653E800A0FB0E /* BLEManager.swift */; };
 		D3B133681F5BCBC00006D968 /* PanoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3B133671F5BCBC00006D968 /* PanoViewController.swift */; };
 		D3B17B741F4018B800A7F6F1 /* PanoPeripheral.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3B17B731F4018B800A7F6F1 /* PanoPeripheral.swift */; };
-		D3B17B761F4A6CCF00A7F6F1 /* PanoSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3B17B751F4A6CCF00A7F6F1 /* PanoSettings.swift */; };
 		D3E2B8001F5DD1750018C642 /* PadViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E2B7FF1F5DD1750018C642 /* PadViewController.swift */; };
 		D3ED73CA1F377904000C8A97 /* DeviceTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3ED73C91F377904000C8A97 /* DeviceTableViewController.swift */; };
 		D3ED73CC1F377953000C8A97 /* DeviceTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3ED73CB1F377953000C8A97 /* DeviceTableViewCell.swift */; };
@@ -39,6 +40,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D33A74921F94813A005CCAC9 /* Pano.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pano.swift; sourceTree = "<group>"; };
 		D39570381F2EC01900388325 /* PanoController.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PanoController.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D395703B1F2EC01900388325 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = AppDelegate.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		D39570401F2EC01900388325 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -55,9 +57,9 @@
 		D39570661F32F34F00388325 /* ToggleTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToggleTableViewCell.swift; sourceTree = "<group>"; };
 		D39570681F32F38500388325 /* SelectTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectTableViewCell.swift; sourceTree = "<group>"; };
 		D395706A1F32FE4600388325 /* RangeTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RangeTableViewCell.swift; sourceTree = "<group>"; };
+		D3A4FDBF1FA653E800A0FB0E /* BLEManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEManager.swift; sourceTree = "<group>"; };
 		D3B133671F5BCBC00006D968 /* PanoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PanoViewController.swift; sourceTree = "<group>"; };
 		D3B17B731F4018B800A7F6F1 /* PanoPeripheral.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PanoPeripheral.swift; sourceTree = "<group>"; };
-		D3B17B751F4A6CCF00A7F6F1 /* PanoSettings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PanoSettings.swift; sourceTree = "<group>"; };
 		D3E2B7FF1F5DD1750018C642 /* PadViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PadViewController.swift; sourceTree = "<group>"; };
 		D3ED73C91F377904000C8A97 /* DeviceTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = DeviceTableViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		D3ED73CB1F377953000C8A97 /* DeviceTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = DeviceTableViewCell.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -111,6 +113,11 @@
 				D39570471F2EC01900388325 /* LaunchScreen.storyboard */,
 				D395704A1F2EC01A00388325 /* Info.plist */,
 				D39570421F2EC01900388325 /* PanoController.xcdatamodeld */,
+				D3B133671F5BCBC00006D968 /* PanoViewController.swift */,
+				D3A4FDBF1FA653E800A0FB0E /* BLEManager.swift */,
+				D3B17B731F4018B800A7F6F1 /* PanoPeripheral.swift */,
+				D33A74921F94813A005CCAC9 /* Pano.swift */,
+				D3E2B7FF1F5DD1750018C642 /* PadViewController.swift */,
 				D395705E1F2EC10A00388325 /* MenuTableViewController.swift */,
 				D39570601F2EC51700388325 /* Menu.swift */,
 				D39570681F32F38500388325 /* SelectTableViewCell.swift */,
@@ -119,10 +126,6 @@
 				D39570621F30535200388325 /* OptionViewController.swift */,
 				D3ED73C91F377904000C8A97 /* DeviceTableViewController.swift */,
 				D3ED73CB1F377953000C8A97 /* DeviceTableViewCell.swift */,
-				D3B17B731F4018B800A7F6F1 /* PanoPeripheral.swift */,
-				D3B17B751F4A6CCF00A7F6F1 /* PanoSettings.swift */,
-				D3B133671F5BCBC00006D968 /* PanoViewController.swift */,
-				D3E2B7FF1F5DD1750018C642 /* PadViewController.swift */,
 			);
 			path = PanoController;
 			sourceTree = "<group>";
@@ -189,17 +192,19 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0830;
-				LastUpgradeCheck = 0830;
+				LastUpgradeCheck = 0900;
 				ORGANIZATIONNAME = "Laurentiu Badea";
 				TargetAttributes = {
 					D39570371F2EC01900388325 = {
 						CreatedOnToolsVersion = 8.3.3;
 						DevelopmentTeam = GHP2FHS6KT;
+						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 					};
 					D395704E1F2EC01A00388325 = {
 						CreatedOnToolsVersion = 8.3.3;
 						DevelopmentTeam = GHP2FHS6KT;
+						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 						TestTargetID = D39570371F2EC01900388325;
 					};
@@ -256,13 +261,14 @@
 				D395703C1F2EC01900388325 /* AppDelegate.swift in Sources */,
 				D3ED73CC1F377953000C8A97 /* DeviceTableViewCell.swift in Sources */,
 				D3B17B741F4018B800A7F6F1 /* PanoPeripheral.swift in Sources */,
+				D3A4FDC01FA653E800A0FB0E /* BLEManager.swift in Sources */,
 				D39570611F2EC51700388325 /* Menu.swift in Sources */,
-				D3B17B761F4A6CCF00A7F6F1 /* PanoSettings.swift in Sources */,
 				D3B133681F5BCBC00006D968 /* PanoViewController.swift in Sources */,
 				D395705F1F2EC10A00388325 /* MenuTableViewController.swift in Sources */,
 				D3ED73CA1F377904000C8A97 /* DeviceTableViewController.swift in Sources */,
 				D3E2B8001F5DD1750018C642 /* PadViewController.swift in Sources */,
 				D39570691F32F38500388325 /* SelectTableViewCell.swift in Sources */,
+				D33A74931F94813A005CCAC9 /* Pano.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -314,7 +320,9 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
@@ -322,7 +330,11 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -365,7 +377,9 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
@@ -373,7 +387,11 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -408,7 +426,8 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.wotevah.PanoController;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
+				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
 		};
@@ -421,7 +440,8 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.wotevah.PanoController;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
+				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
 		};
@@ -435,7 +455,8 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.wotevah.PanoControllerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
+				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
+				SWIFT_VERSION = 4.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PanoController.app/PanoController";
 			};
 			name = Debug;
@@ -450,7 +471,8 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.wotevah.PanoControllerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
+				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
+				SWIFT_VERSION = 4.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PanoController.app/PanoController";
 			};
 			name = Release;

@@ -14,7 +14,7 @@ enum MoveMode {
 }
 
 class PadViewController: UIViewController {
-    var panoPeripheral: PanoPeripheral?
+    var bleManager: BLEManager!
     var moveMode: MoveMode = .freeMove
     var timer: Timer?
 
@@ -25,10 +25,7 @@ class PadViewController: UIViewController {
     }
 
     override func viewWillAppear(_ animated: Bool) {
-        print("PadViewControler: \(String(describing: panoPeripheral))")
-        //if let panoPeripheral = panoPeripheral {
-        //    panoPeripheral.delegate = self
-        //}
+        print("PadViewControler: \(String(describing: bleManager))")
     }
 
     override func didReceiveMemoryWarning() {
@@ -50,7 +47,7 @@ class PadViewController: UIViewController {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) {
             (timer: Timer) in
-            self.panoPeripheral?.sendFreeMove(horizontal: horizontal, vertical: vertical)
+            self.bleManager.panoPeripheral?.writeLine("A\(horizontal*2) C\(vertical*2) M114") // FIXME: gcode, use Pano and disable accel
         }
     }
     func stopFreeMove(){
@@ -59,7 +56,7 @@ class PadViewController: UIViewController {
 
     @IBAction func leftArrowBegin(_ sender: UIButton) {
         switch moveMode {
-        case .gridMove: panoPeripheral?.sendIncMove(.back)
+        case .gridMove: break // FIXME: bleManager.panoPeripheral?.sendIncMove(.back)
         case .freeMove: repeatFreeMove(horizontal: -1, vertical: 0)
         }
     }
@@ -69,7 +66,7 @@ class PadViewController: UIViewController {
 
     @IBAction func rightArrowBegin(_ sender: UIButton) {
         switch moveMode {
-        case .gridMove: panoPeripheral?.sendIncMove(.forward)
+        case .gridMove: break // FIXME: bleManager.panoPeripheral?.sendIncMove(.forward)
         case .freeMove: repeatFreeMove(horizontal: 1, vertical: 0)
         }
     }
@@ -79,7 +76,7 @@ class PadViewController: UIViewController {
 
     @IBAction func upArrowBegin(_ sender: UIButton) {
         switch moveMode {
-        case .gridMove: panoPeripheral?.sendIncMove(.up)
+        case .gridMove: break // FIXME: bleManager.panoPeripheral?.sendIncMove(.up)
         case .freeMove: repeatFreeMove(horizontal: 0, vertical: 1)
         }
     }
@@ -89,7 +86,7 @@ class PadViewController: UIViewController {
 
     @IBAction func downArrowBegin(_ sender: UIButton) {
         switch moveMode {
-        case .gridMove: panoPeripheral?.sendIncMove(.down)
+        case .gridMove: break // FIXME: bleManager.panoPeripheral?.sendIncMove(.down)
         case .freeMove: repeatFreeMove(horizontal: 0, vertical: -1)
         }
     }
@@ -103,6 +100,6 @@ class PadViewController: UIViewController {
     }
 
     @IBAction func shutter(_ sender: UIButton) {
-        panoPeripheral?.send(command: .shutter)
+        bleManager.panoPeripheral?.writeLine("M240 P0.01 Q0 R0.1") // FIXME: gcode, use Pano
     }
 }
