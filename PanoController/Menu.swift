@@ -3,7 +3,7 @@
 //  PanoController
 //
 //  Created by Laurentiu Badea on 7/30/17.
-//  Copyright © 2017 Laurentiu Badea.
+//  Copyright © 2017-2019 Laurentiu Badea.
 //
 //  This file may be redistributed under the terms of the MIT license.
 //  A copy of this license has been included with this distribution in the file LICENSE.
@@ -24,6 +24,7 @@ enum MenuItemKey {
     case infiniteRotation
     case zeroMotionWait
     case stabilized
+    case gridOrder
 }
 
 protocol MenuItemDelegate {
@@ -224,6 +225,10 @@ func getMenus(_ delegate: MenuItemDelegate) -> Menu {
             ListSelector("Aspect Ratio", delegate: delegate, key: .aspect, options: [
                 Option("Portrait 2:3", 23),
                 Option("Landscape 3:2", 32, isDefault: true),
+                ]),
+            ListSelector("Grid Order", delegate: delegate, key: .gridOrder, options: [
+                Option("Row then Column", Pano.GridOrder.RowFirst, isDefault: true),
+                Option("Column then Row", Pano.GridOrder.ColumnFirst)
                 ]),
             Switch("Image Stabilization", delegate: delegate, key: .stabilized, false),
         ]),

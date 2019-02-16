@@ -373,6 +373,7 @@ extension Pano: MenuItemDelegate {
             case 23: (self.sensorWidth, self.sensorHeight) = (24, 36)
             default: break
             }
+        case .gridOrder:   self.gridOrder = value as! GridOrder
         case .infiniteRotation: self.infiniteRotation = value as! Bool
         case .zeroMotionWait: self.zeroMotionWait = value as! Double
         case .stabilized: self.stabilizationStops = value as! Bool ? 2 : 0;
