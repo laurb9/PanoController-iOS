@@ -59,6 +59,11 @@ class Pano : NSObject {
     }
     var state: State = .Idle
 
+    enum GridOrder {
+        case RowFirst
+        case ColumnFirst
+    }
+
     // Configuration
     var focalLength = 35.0     // mm
     var sensorWidth = 36.0     // mm
@@ -74,6 +79,7 @@ class Pano : NSObject {
     var overlap = 0.2          // 0 - 1 (representing 0% - 100%)
     var infiniteRotation = false  // allow continuous horizontal rotation - no cables to tangle
     var stabilizationStops = 0.0  // how many stops of IS we should count on
+    var gridOrder: GridOrder = .RowFirst
 
     // State
     var position = 0
@@ -97,7 +103,7 @@ class Pano : NSObject {
                              "M202 A\(Int(18*Double(platform["MaxAccelA"]!)!/focalLength)) C\(Int(18*Double(platform["MaxAccelC"]!)!/focalLength))",
                              "M503"].makeIterator()
         self.position = 0
-        var targetPosition = 0  // moveTo() keeps track of the previous position to calculate offsets, so we cannot modify it directly
+        var running = true
         return AnyIterator<String> {
             // Awkward state keeping. There has got to be a better way! Maybe a queue ?
             // Send from buffer as long as it's not empty
@@ -106,7 +112,7 @@ class Pano : NSObject {
             } else {
                 // Command buffer is empty, replace with a new one
                 var commands: [String] = []
-                if targetPosition < self.rows * self.cols {
+                if running {
                     // Actual program
                     //commands.append(";\(self.position+1)/\(self.rows*self.cols)")
                     if (self.preShutter > 0){
@@ -131,6 +137,7 @@ class Pano : NSObject {
                         commands.append("A\(horizMove.format(2)) C\(vertMove.format(2)) M114 M503 P2")
                     } else {
                         // End of program
+                        running = false
                         commands += ["G0 G28", "M18 M114 M503"]
                     }
                 }
@@ -139,6 +146,26 @@ class Pano : NSObject {
                 return cmd
             }
         }
+    }
+
+    // Move to next grid position in grid following order
+    func moveToNextPosition() -> (Double, Double) {
+        let horiz: Double
+        let vert: Double
+        switch gridOrder {
+        case .RowFirst:
+            (horiz, vert) = moveTo(to: position + 1)
+        case .ColumnFirst:
+            if position == rows * cols - 1 {
+                (horiz, vert) = (0.0, 0.0)
+            } else if position < (rows-1) * cols {
+                (horiz, vert) = moveTo(to: position + cols)
+            } else {
+                 // last row, rewind to top (will return 0,0 when out of bounds)
+                (horiz, vert) = moveTo(to: (position % cols) + 1 )
+            }
+        }
+        return (horiz, vert)
     }
 
     // Move to grid position by photo index (0-number of photos)

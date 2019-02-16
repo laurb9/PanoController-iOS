@@ -73,7 +73,133 @@ class PanoControllerTests: XCTestCase {
         XCTAssertEqual(pano.vertCellMove, 28.74, accuracy: 0.01)
     }
 
-    func testPanoGCode() {
+    private func checkMoveMethod(method: (Int)->(Double, Double), against expectedGridMoves: [(Int, Int, Int)]){
+        for (position, expectHorizMove, expectVertMove) in expectedGridMoves {
+            let (horizMove, vertMove) = method(position)
+            if Int(horizMove) != expectHorizMove || Int(vertMove) != expectVertMove {
+                XCTFail("moveTo(to: \(position)): got \(Int(horizMove)),\(Int(vertMove)) expected \(expectHorizMove),\(expectVertMove)")
+            }
+        }
+    }
+
+    // Test direct access cell sweep by cell grid coordinates
+    func testGridMoveTo(){
+        // regular field-limited pano 2x3
+        // Col -    0 1 2 *50
+        //        .------
+        // Row 0  | 0 1 2
+        // *-30 1 | 3 4 5
+        pano.rows = 2
+        pano.cols = 3
+        pano.horizCellMove = 50
+        pano.vertCellMove = 30
+        pano.position = 0
+        let expectedGridMoves = [
+            (0,0,    0,    0),
+            (0,1,   50,    0),
+            (0,2,   50,    0),
+            (1,1,  -50,  -30),
+            (0,1,    0,   30),
+            (1,2,   50,  -30),
+            (0,0, -100,   30)
+        ]
+        for (row, col, expectHorizMove, expectVertMove) in expectedGridMoves {
+            let (horizMove, vertMove) = pano.moveTo(row: row, col: col)
+            if Int(horizMove) != expectHorizMove || Int(vertMove) != expectVertMove {
+                XCTFail("moveTo(to: \(row),\(col)): got \(Int(horizMove)),\(Int(vertMove)) expected \(expectHorizMove),\(expectVertMove)")
+            }
+        }
+    }
+
+    // Test direct access cell sweep by linear shot position
+    func testMoveToPosition(){
+        // regular field-limited pano 2x3
+        // Col -    0 1 2 *50
+        //        .------
+        // Row 0  | 0 1 2
+        // *-30 1 | 3 4 5
+        pano.rows = 2
+        pano.cols = 3
+        pano.horizCellMove = 50
+        pano.vertCellMove = 30
+        pano.position = 0
+        let expectedGridMoves = [
+            (0,    0,    0),
+            (1,   50,    0),
+            (2,   50,    0),
+            (4,  -50,  -30),
+            (1,    0,   30),
+            (5,   50,  -30),
+            (0, -100,   30)
+        ]
+        for (position, expectHorizMove, expectVertMove) in expectedGridMoves {
+            let (horizMove, vertMove) = pano.moveTo(to: position)
+            if Int(horizMove) != expectHorizMove || Int(vertMove) != expectVertMove {
+                XCTFail("moveTo(to: \(position)): got \(Int(horizMove)),\(Int(vertMove)) expected \(expectHorizMove),\(expectVertMove)")
+            }
+        }
+    }
+
+    // Test incremental cell sweep movements in RowFirst mode
+    func testMoveToNextPositionRowFirst(){
+        // regular field-limited pano 2x3
+        // Col -    0 1 2 *50
+        //        .------
+        // Row 0  | 0 1 2
+        // *-30 1 | 3 4 5
+        pano.rows = 2
+        pano.cols = 3
+        pano.horizCellMove = 50
+        pano.vertCellMove = 30
+        pano.position = 0
+        pano.gridOrder = .RowFirst
+        let expectedGridMoves = [
+            (1,   50,   0),
+            (2,   50,   0),
+            (3, -100, -30),
+            (4,   50,   0),
+            (5,   50,   0),
+            (0,    0,   0)   // a 0,0 move indicates end of pano
+        ]
+        for (position, expectHorizMove, expectVertMove) in expectedGridMoves {
+            let (horizMove, vertMove) = pano.moveToNextPosition()
+            if Int(horizMove) != expectHorizMove || Int(vertMove) != expectVertMove {
+                XCTFail("cell \(position): got \(Int(horizMove)),\(Int(vertMove)) expected \(expectHorizMove),\(expectVertMove)")
+            }
+        }
+    }
+
+    // Test incremental cell sweep movements in ColumnFirst mode
+    func testMoveToNextPositionColumnFirst(){
+        // regular field-limited pano 2x3
+        // Col -    0 1 2 *50
+        //        .------
+        // Row 0  | 0 1 2
+        // *-30 1 | 3 4 5
+        pano.rows = 2
+        pano.cols = 3
+        pano.horizCellMove = 50
+        pano.vertCellMove = 30
+        pano.position = 0
+        pano.gridOrder = .ColumnFirst
+        let expectedGridMoves = [
+            (3,    0, -30),
+            (1,   50,  30),
+            (4,    0, -30),
+            (2,   50,  30),
+            (5,    0, -30),
+            (0,    0,   0)   // a 0,0 move indicates end of pano
+        ]
+        for (position, expectHorizMove, expectVertMove) in expectedGridMoves {
+            let (horizMove, vertMove) = pano.moveToNextPosition()
+            if Int(horizMove) != expectHorizMove || Int(vertMove) != expectVertMove {
+                XCTFail("cell \(position): got \(Int(horizMove)),\(Int(vertMove)) expected \(expectHorizMove),\(expectVertMove)")
+            }
+        }
+    }
+
+    // Test complete G-Code generator for a bounded pano (non-360)
+    func testGCode() {
         pano.panoHorizFOV = 10
         pano.panoVertFOV = 10
         pano.focalLength = 300
@@ -82,6 +208,7 @@ class PanoControllerTests: XCTestCase {
         pano.preShutter = 0
         pano.postShutter = 0
         pano.zeroMotionWait = 0.1
+        pano.gridOrder = .RowFirst
         pano.platform = ["MaxSpeedA": "600",
                          "MaxSpeedC": "100",
                          "MaxAccelA": "360",
@@ -114,6 +241,7 @@ class PanoControllerTests: XCTestCase {
         pano.postShutter = 0.5
         pano.zeroMotionWait = 0
         pano.infiniteRotation = true
+        pano.gridOrder = .RowFirst
         pano.platform = ["MaxSpeedA": "600",
                          "MaxSpeedC": "100",
                          "MaxAccelA": "360",
