@@ -11,7 +11,7 @@ import Foundation
 extension String {
     func kvToDict() -> [String: String]? {
         let vals = self
-            .split(separator: "\t")
+            .split(separator: " ")
             .flatMap { (s) -> (String, String)? in
                 let kv = s.split(separator: "=", maxSplits: 1)
                 if kv.count == 2 {
@@ -108,7 +108,7 @@ class Pano : NSObject {
                 var commands: [String] = []
                 if targetPosition < self.rows * self.cols {
                     // Actual program
-                    commands.append(";\(targetPosition+1)/\(self.rows*self.cols)")
+                    //commands.append(";\(targetPosition+1)/\(self.rows*self.cols)")
                     let (horizMove, vertMove) = self.moveTo(to: targetPosition)
                     commands.append("A\(horizMove.format(2)) C\(vertMove.format(2)) M114 M503 P2")
                     if (self.preShutter > 0){
