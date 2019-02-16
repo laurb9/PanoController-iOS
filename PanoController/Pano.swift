@@ -3,7 +3,7 @@
 //  PanoController
 //
 //  Created by Laurentiu Badea on 10/15/17.
-//  Copyright © 2017 Laurentiu Badea. All rights reserved.
+//  Copyright © 2017-2019 Laurentiu Badea. All rights reserved.
 //
 
 import Foundation
@@ -92,9 +92,9 @@ class Pano : NSObject {
     // While harder on the eyes, this allows in-flight changing parameters like position, for example
     var gCode: AnyIterator<String> {
         computeGrid()
-        var commandBuffer = ["M17 M320 G1 G91 G92 A0 C0",
+        var commandBuffer = ["M17 M320 G1 G91 G92.1",
                              "M203 A\(platform["MaxSpeedA"]!) C\(platform["MaxSpeedC"]!)",
-                             "M202 A\(18*Double(platform["MaxAccelA"]!)!/focalLength) C\(18*Double(platform["MaxAccelC"]!)!/focalLength)",
+                             "M202 A\(Int(18*Double(platform["MaxAccelA"]!)!/focalLength)) C\(Int(18*Double(platform["MaxAccelC"]!)!/focalLength))",
                              "M503"].makeIterator()
         self.position = 0
         var targetPosition = 0  // moveTo() keeps track of the previous position to calculate offsets, so we cannot modify it directly
@@ -108,9 +108,7 @@ class Pano : NSObject {
                 var commands: [String] = []
                 if targetPosition < self.rows * self.cols {
                     // Actual program
-                    //commands.append(";\(targetPosition+1)/\(self.rows*self.cols)")
-                    let (horizMove, vertMove) = self.moveTo(to: targetPosition)
-                    commands.append("A\(horizMove.format(2)) C\(vertMove.format(2)) M114 M503 P2")
+                    //commands.append(";\(self.position+1)/\(self.rows*self.cols)")
                     if (self.preShutter > 0){
                         commands.append("G4 S\(self.preShutter.format())")
                     }
@@ -120,13 +118,18 @@ class Pano : NSObject {
                     }
                     if self.shutter > 0 {
                         for _ in 0..<self.shotCount {
-                            commands.append("M240 S\(self.shutter.format()) Q\(self.shutterLong ? 1 : 0) R\(self.postShutter.format())")
+                            commands.append("M240 S\(self.shutter.format()) Q\(self.shutterLong ? 1 : 0)")
+                            if self.postShutter > 0 {
+                                commands.append("G4 S\(self.postShutter.format())")
+                            }
                         }
                     } else {
                         commands.append("M0")
                     }
-                    targetPosition += 1
-                    if targetPosition == self.rows * self.cols {
+                    let (horizMove, vertMove) = self.moveToNextPosition()
+                    if horizMove != 0 || vertMove != 0 {
+                        commands.append("A\(horizMove.format(2)) C\(vertMove.format(2)) M114 M503 P2")
+                    } else {
                         // End of program
                         commands += ["G0 G28", "M18 M114 M503"]
                     }
@@ -146,6 +149,7 @@ class Pano : NSObject {
     // Move to specified grid position
     // @param row: requested row position [0 - vert_count)
     // @param col: requested col position [0 - horiz_count)
+    // @return horizMove, vertMove: relative movement to target position
     func moveTo(row: Int, col: Int) -> (Double, Double) {
         let currentRow = position / cols
         let currentCol = position % cols
@@ -197,7 +201,7 @@ class Pano : NSObject {
     // @param totalSize: entire grid size (1-360 degrees)
     // @param overlap: min required overlap (0.01 - 0.99)
     // @param blockSize: ref to initial (max) block size (will be updated)
-    // @return count: ref to image count (will be updated)
+    // @return count: image count
     func gridFit(totalSize: Double, overlap: Double, blockSize: inout Double) -> Int {
         var totalSize = totalSize;
         var count = 1;
