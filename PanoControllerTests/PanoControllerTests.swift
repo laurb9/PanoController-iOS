@@ -65,15 +65,21 @@ class PanoControllerTests: XCTestCase {
         pano.shutter = 1/100
         pano.preShutter = 0
         pano.postShutter = 0
+        pano.zeroMotionWait = 0.1
+        pano.platform = ["MaxSpeedA": "600",
+                         "MaxSpeedC": "100",
+                         "MaxAccelA": "360",
+                         "MaxAccelC": "120"]
         let gcode = Array(pano.gCode)
         let expected = [
-            "M17 G1 G91 G92 A0 C0",
-            "A0.00 C0.00 M114 M503", "M116 P10 Q115", "M240 P0.01 Q0 R0",
-            "A4.31 C0.00 M114 M503", "M116 P10 Q115", "M240 P0.01 Q0 R0",
-            "A-4.31 C-3.03 M114 M503", "M116 P10 Q115", "M240 P0.01 Q0 R0",
-            "A4.31 C0.00 M114 M503", "M116 P10 Q115", "M240 P0.01 Q0 R0",
-            "A-4.31 C-3.03 M114 M503", "M116 P10 Q115", "M240 P0.01 Q0 R0",
-            "A4.31 C0.00 M114 M503", "M116 P10 Q115", "M240 P0.01 Q0 R0",
+            "M17 M320 G1 G91 G92 A0 C0", "M203 A600 C100", "M202 A21.6 C7.2",
+            "M503",
+            "A0.00 C0.00 M114 M503 P2", "M116 S0.1 Q0.115", "M240 S0.01 Q0 R0",
+            "A4.31 C0.00 M114 M503 P2", "M116 S0.1 Q0.115", "M240 S0.01 Q0 R0",
+            "A-4.31 C-3.03 M114 M503 P2", "M116 S0.1 Q0.115", "M240 S0.01 Q0 R0",
+            "A4.31 C0.00 M114 M503 P2", "M116 S0.1 Q0.115", "M240 S0.01 Q0 R0",
+            "A-4.31 C-3.03 M114 M503 P2", "M116 S0.1 Q0.115", "M240 S0.01 Q0 R0",
+            "A4.31 C0.00 M114 M503 P2", "M116 S0.1 Q0.115", "M240 S0.01 Q0 R0",
             "G0 G28",
             "M18 M114 M503"]
         for (gcodeLine, expectedLine) in zip(gcode, expected) {
@@ -89,17 +95,24 @@ class PanoControllerTests: XCTestCase {
         pano.shutter = 1/100
         pano.preShutter = 0
         pano.postShutter = 0.5
+        pano.zeroMotionWait = 0
+        pano.infiniteRotation = true
+        pano.platform = ["MaxSpeedA": "600",
+                         "MaxSpeedC": "100",
+                         "MaxAccelA": "360",
+                         "MaxAccelC": "120"]
         let gcode = Array(pano.gCode)
         let expected = [
-            "M17 G1 G91 G92 A0 C0",
-            "A0.00 C0.00 M114 M503", "M116 P10 Q2250", "M240 P0.01 Q0 R0.5",
-            "A90.00 C0.00 M114 M503", "M116 P10 Q2250", "M240 P0.01 Q0 R0.5",
-            "A90.00 C0.00 M114 M503", "M116 P10 Q2250", "M240 P0.01 Q0 R0.5",
-            "A90.00 C0.00 M114 M503", "M116 P10 Q2250", "M240 P0.01 Q0 R0.5",
-            "A90.00 C-51.00 M114 M503", "M116 P10 Q2250", "M240 P0.01 Q0 R0.5",
-            "A90.00 C0.00 M114 M503", "M116 P10 Q2250", "M240 P0.01 Q0 R0.5",
-            "A90.00 C0.00 M114 M503", "M116 P10 Q2250", "M240 P0.01 Q0 R0.5",
-            "A90.00 C0.00 M114 M503", "M116 P10 Q2250", "M240 P0.01 Q0 R0.5",
+            "M17 M320 G1 G91 G92 A0 C0", "M203 A600 C100", "M202 A540.0 C180.0",
+            "M503",
+            "A0.00 C0.00 M114 M503 P2", "M240 S0.01 Q0 R0.5",
+            "A90.00 C0.00 M114 M503 P2", "M240 S0.01 Q0 R0.5",
+            "A90.00 C0.00 M114 M503 P2", "M240 S0.01 Q0 R0.5",
+            "A90.00 C0.00 M114 M503 P2", "M240 S0.01 Q0 R0.5",
+            "A90.00 C-51.00 M114 M503 P2", "M240 S0.01 Q0 R0.5",
+            "A90.00 C0.00 M114 M503 P2", "M240 S0.01 Q0 R0.5",
+            "A90.00 C0.00 M114 M503 P2", "M240 S0.01 Q0 R0.5",
+            "A90.00 C0.00 M114 M503 P2", "M240 S0.01 Q0 R0.5",
             "G0 G28",
             "M18 M114 M503"]
         for (gcodeLine, expectedLine) in zip(gcode, expected) {
