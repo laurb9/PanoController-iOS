@@ -17,7 +17,7 @@ extension String {
     func kvToDict() -> [String: String]? {
         let vals = self
             .split(separator: " ")
-            .flatMap { (s) -> (String, String)? in
+            .compactMap { (s) -> (String, String)? in
                 let kv = s.split(separator: "=", maxSplits: 1)
                 if kv.count == 2 {
                     let key = kv[0], val = kv[1]
