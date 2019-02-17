@@ -3,16 +3,21 @@
 //  PanoController
 //
 //  Created by Laurentiu Badea on 10/15/17.
-//  Copyright © 2017 Laurentiu Badea. All rights reserved.
+//  Copyright © 2017-2019 Laurentiu Badea. All rights reserved.
 //
 
 import Foundation
 
 extension String {
+    /**
+     Parse a string of space-separated key=value pairs into a Dictionary.
+     Unrecognized elements are ignored.
+     - Returns: Dictionary like `["AAA": "1", "BBB": "2"]` for an input of `"FOO AAA=1 BBB=2"`
+     */
     func kvToDict() -> [String: String]? {
         let vals = self
             .split(separator: " ")
-            .flatMap { (s) -> (String, String)? in
+            .compactMap { (s) -> (String, String)? in
                 let kv = s.split(separator: "=", maxSplits: 1)
                 if kv.count == 2 {
                     let key = kv[0], val = kv[1]
@@ -30,7 +35,7 @@ extension String {
 }
 
 extension Data {
-    // Convert Data containing key=value pairs into a Dictionary<String:String>
+    /// Convert Data containing space-separated key=value pairs into a Dictionary - see String.kvToDict
     func kvToDict() -> [String: String]? {
         if let kvPairs = String.init(data: self, encoding: .utf8){
             return kvPairs.kvToDict()
@@ -40,6 +45,11 @@ extension Data {
 }
 
 extension Double {
+    /**
+     Format double with given number of decimal points
+     - Parameter precision: number of decimal points
+     - Returns: formatted string: "1.23"
+     */
     func format(_ precision: Int) -> String {
         return String(format: "%.\(precision)f", self)
     }
@@ -50,6 +60,13 @@ extension Double {
     }
 }
 
+/**
+ Pano Controller class is the counterpart to the Firmware running on the platform.
+ - is configured by the Menu
+ - sends instructions to platform in the form of G-code
+ - receives status updates from platform
+ - exposes its status to the View
+ */
 class Pano : NSObject {
     enum State {
         case Idle
@@ -59,45 +76,81 @@ class Pano : NSObject {
     }
     var state: State = .Idle
 
-    // Configuration
-    var focalLength = 35.0     // mm
-    var sensorWidth = 36.0     // mm
-    var sensorHeight = 24.0    // mm
-    var shutter = 0.1          // s
-    var preShutter = 0.0       // s
-    var postShutter = 0.0      // s
-    var zeroMotionWait = 0.0   // s
-    var shutterLong = false
-    var shotCount = 1
-    var panoHorizFOV = 180.0   // 1-360°
-    var panoVertFOV = 90.0    // 1-180°
-    var overlap = 0.2          // 0 - 1 (representing 0% - 100%)
-    var infiniteRotation = false  // allow continuous horizontal rotation - no cables to tangle
-    var stabilizationStops = 0.0  // how many stops of IS we should count on
+    enum GridOrder {
+        case RowFirst
+        case ColumnFirst
+    }
 
-    // State
+    // MARK: - Pano Configuration
+
+    /// Focal length, in mm
+    var focalLength = 35.0
+    /// Sensor width, in mm
+    var sensorWidth = 36.0
+    /// Sensor height, in mm
+    var sensorHeight = 24.0
+    /// Shutter speed, in seconds
+    var shutter = 0.1
+    /// Time to wait before shutter actuation, in seconds
+    var preShutter = 0.0
+    /// Time to wait after shutter actuation, in seconds
+    var postShutter = 0.0
+    /// Max time to wait for platform shake low enough to take the photo, in seconds
+    var zeroMotionWait = 0.0
+    /// If true, hold shutter down for the entire shutter period instead of a few ms
+    var shutterLong = false
+    /// Number of shots to take in each position
+    var shotCount = 1
+    /// Panorama horizontal field of view, in degrees 1-360°
+    var panoHorizFOV = 180.0
+    /// Panorama vertical field of view, in degrees 1-180°
+    var panoVertFOV = 90.0
+    /// How much should the photo edges overlap, 0.01 - 0.9 for 1% - 90%
+    var overlap = 0.2
+    /// Allow continuous horizontal rotation, set only if there are no external cables to wrap
+    var infiniteRotation = false
+    /// How many stops of Image Stabilization we can count on
+    var stabilizationStops = 0.0
+    /// Pano execution order, RowFirst does complete rows, ColumnFirst does complete columns
+    var gridOrder: GridOrder = .RowFirst
+
+    // MARK: - Pano State
+
+    /// linear position of this shot (0..<rows*cols)
     var position = 0
 
     // Computed values
-    var horizCellMove = 0.0    // °
-    var vertCellMove = 0.0     // °
+    /// Horizontal move to advance one cell, in degrees
+    var horizCellMove = 0.0
+    /// Vertical move to advance one cell, in degrees
+    var vertCellMove = 0.0
+    /// Computed number of rows needed to cover the horizontal pano FOV
     var rows = 0
+    /// Computed number of columns needed to cover the vertical pano FOV
     var cols = 0
 
+    // MARK: - G-code Generation
+
     // G-Code Interpreter Status and Configs
+    /// Hardware platform configuration received from remote
     var platform: [String: String] = [:]
+
+    /// Initialized G-Code Generator
     var program: AnyIterator<String>?
 
-    // Generate the gCode program to execute the current pano step by step
-    // While harder on the eyes, this allows in-flight changing parameters like position, for example
+    // While harder on the eyes, this approach allows in-flight changing parameters like position, for example
+    /**
+     Generate the G-code program to execute the current pano step by step.
+     - Returns: iterator over a list of dynamically generated strings containing the G-code program
+     */
     var gCode: AnyIterator<String> {
         computeGrid()
-        var commandBuffer = ["M17 M320 G1 G91 G92 A0 C0",
+        var commandBuffer = ["M17 M320 G1 G91 G92.1",
                              "M203 A\(platform["MaxSpeedA"]!) C\(platform["MaxSpeedC"]!)",
-                             "M202 A\(18*Double(platform["MaxAccelA"]!)!/focalLength) C\(18*Double(platform["MaxAccelC"]!)!/focalLength)",
+                             "M202 A\(Int(18*Double(platform["MaxAccelA"]!)!/focalLength)) C\(Int(18*Double(platform["MaxAccelC"]!)!/focalLength))",
                              "M503"].makeIterator()
         self.position = 0
-        var targetPosition = 0  // moveTo() keeps track of the previous position to calculate offsets, so we cannot modify it directly
+        var running = true
         return AnyIterator<String> {
             // Awkward state keeping. There has got to be a better way! Maybe a queue ?
             // Send from buffer as long as it's not empty
@@ -106,11 +159,9 @@ class Pano : NSObject {
             } else {
                 // Command buffer is empty, replace with a new one
                 var commands: [String] = []
-                if targetPosition < self.rows * self.cols {
+                if running {
                     // Actual program
-                    //commands.append(";\(targetPosition+1)/\(self.rows*self.cols)")
-                    let (horizMove, vertMove) = self.moveTo(to: targetPosition)
-                    commands.append("A\(horizMove.format(2)) C\(vertMove.format(2)) M114 M503 P2")
+                    //commands.append(";\(self.position+1)/\(self.rows*self.cols)")
                     if (self.preShutter > 0){
                         commands.append("G4 S\(self.preShutter.format())")
                     }
@@ -120,14 +171,20 @@ class Pano : NSObject {
                     }
                     if self.shutter > 0 {
                         for _ in 0..<self.shotCount {
-                            commands.append("M240 S\(self.shutter.format()) Q\(self.shutterLong ? 1 : 0) R\(self.postShutter.format())")
+                            commands.append("M240 S\(self.shutter.format()) Q\(self.shutterLong ? 1 : 0)")
+                            if self.postShutter > 0 {
+                                commands.append("G4 S\(self.postShutter.format())")
+                            }
                         }
                     } else {
                         commands.append("M0")
                     }
-                    targetPosition += 1
-                    if targetPosition == self.rows * self.cols {
+                    let (horizMove, vertMove) = self.moveToNextPosition()
+                    if horizMove != 0 || vertMove != 0 {
+                        commands.append("A\(horizMove.format(2)) C\(vertMove.format(2)) M114 M503 P2")
+                    } else {
                         // End of program
+                        running = false
                         commands += ["G0 G28", "M18 M114 M503"]
                     }
                 }
@@ -138,21 +195,66 @@ class Pano : NSObject {
         }
     }
 
-    // Move to grid position by photo index (0-number of photos)
-    func moveTo(to targetPosition: Int) -> (Double, Double) {
-        return moveTo(row: targetPosition / cols, col: targetPosition % cols);
+    // MARK: - Move Calculator
+
+    /**
+     Convert photo position to row,col coordinates, taking into account grid order
+     - Parameter pos: photo index position 0..<row*col
+     - Returns: (row, col) as grid coordinates
+     */
+    func positionToRowCol(_ pos: Int) -> (row: Int, col: Int){
+        let currentRow: Int
+        let currentCol: Int
+        switch gridOrder {
+        case .RowFirst:
+            currentRow = pos / cols
+            currentCol = pos % cols
+        case .ColumnFirst:
+            currentRow = pos % rows
+            currentCol = pos / rows
+        }
+        return (currentRow, currentCol)
     }
 
-    // Move to specified grid position
-    // @param row: requested row position [0 - vert_count)
-    // @param col: requested col position [0 - horiz_count)
+    /**
+     Convert photo position to row,col coordinates, taking into account grid order
+     - Parameter row: row grid coordinate
+     - Parameter col: col grid coordinate
+     - Returns: photo index position 0..<row*col
+     */
+    func rowColToPosition(row: Int, col: Int) -> Int {
+        let pos: Int
+        switch gridOrder {
+        case .RowFirst:
+            pos = row * cols + col;
+        case .ColumnFirst:
+            pos = row + col * rows;
+        }
+        return pos
+    }
+
+    /**
+     Move to next grid position respecting current grid order
+     - Returns: `(horizMove, vertMove)` as relative movement in degrees to reach the next cell in the pano sequence. Will return (0, 0) when end of pano is reached.
+     */
+    func moveToNextPosition() -> (Double, Double) {
+        let (row, col) = positionToRowCol(position + 1)
+        return moveTo(row: row, col: col)
+    }
+
+    /**
+     Move to specified grid coordinates and update position
+     - Parameter row: requested row position 0..<rows
+     - Parameter col: request column position 0..<col
+     - Returns: `(horizMove, vertMove)` as relative movement in degrees to reach the requested grid location, or `(0.0, 0.0)` if the location is outside the pano bounds.
+     */
     func moveTo(row: Int, col: Int) -> (Double, Double) {
-        let currentRow = position / cols
-        let currentCol = position % cols
         var horizMove = 0.0
         var vertMove = 0.0
 
+        let (currentRow, currentCol) = positionToRowCol(position)
         if (currentRow >= rows ||
+            currentCol >= cols ||
             row >= rows ||
             col >= cols ||
             col < 0 ||
@@ -180,12 +282,12 @@ class Pano : NSObject {
             // vertical adjustment needed
             vertMove = Double(currentRow - row) * vertCellMove;
         }
-        position = row * cols + col;
+        position = rowColToPosition(row: row, col: col);
         return (horizMove, vertMove)
     }
 
-    // Calculate shot-to-shot horizontal/vertical head movement, taking overlap into account
-    // Must be called every time focal distance or panorama dimensions change.
+    /// Calculate shot-to-shot horizontal/vertical head movement, taking overlap into account
+    /// Must be called every time focal distance or panorama dimensions change.
     func computeGrid() {
         horizCellMove = Pano.lensFOV(for: sensorWidth, at: focalLength)
         vertCellMove = Pano.lensFOV(for: sensorHeight, at: focalLength)
@@ -193,11 +295,13 @@ class Pano : NSObject {
         rows = gridFit(totalSize: panoVertFOV, overlap: overlap, blockSize: &vertCellMove)
     }
 
-    // Helper to calculate grid fit with overlap
-    // @param totalSize: entire grid size (1-360 degrees)
-    // @param overlap: min required overlap (0.01 - 0.99)
-    // @param blockSize: ref to initial (max) block size (will be updated)
-    // @return count: ref to image count (will be updated)
+    /**
+     Helper method to calculate grid fit taking overlap into account
+     - Parameter totalSize: entire grid size (1-360°)
+     - Parameter overlap: min required overlap (0.01 - 0.99)
+     - Parameter blockSize: initial (max) block size **(will be updated)**
+     - Returns: new image count, and updates blockSize
+     */
     func gridFit(totalSize: Double, overlap: Double, blockSize: inout Double) -> Int {
         var totalSize = totalSize;
         var count = 1;
@@ -214,18 +318,31 @@ class Pano : NSObject {
         return count
     }
 
-    // Calculate lens field of view from focal length and sensor size
+    /**
+     Calculate lens field of view from focal length and sensor size
+     - Parameter sensorSize: sensor size [mm] on the FOV axis requested
+     - Parameter focalLength: focal length [mm]
+     - Returns: field of view in degrees
+     */
     static func lensFOV(for sensorSize: Double, at focalLength: Double) -> Double {
         // https://en.wikipedia.org/wiki/Angle_of_view
         return 360.0 * atan(sensorSize / 2.0 / focalLength) / Double.pi
     }
 
-    // Calculate max angular velocity [°/s] for this shutter, focal length and sensor size
+    /**
+     Calculate max permissible angular velocity [°/s] for a given exposure
+     - Parameter sensorSize: sensor size [mm] on the FOV axis requested
+     - Parameter focalLength: focal length [mm]
+     - Parameter resolution: sensor resolution [pixels] where sensorSize was measured
+     - Parameter shutter: shutter speed [seconds]
+     - Parameter stops: image stabilization stops to be taken into account
+     - Returns: max allowed angular velocity in [°/s]
+     */
     static func steadyTarget(for sensorSize: Double, at focalLength: Double, resolution: Int, shutter: Double, stops: Double = 0) -> Double {
         return lensFOV(for: sensorSize, at: focalLength) / Double(resolution) / shutter * pow(2.0, stops)
     }
 
-    // Start sending/executing the generated gCode
+    /// Start sending/executing the generated gCode
     func startProgram(_ panoPeripheral: PanoPeripheral) {
         state = .Running
         program = gCode
@@ -233,7 +350,7 @@ class Pano : NSObject {
     }
 }
 
-// MARK: -- PanoPeripheralDelegate
+// MARK: - PanoPeripheralDelegate
 
 extension Pano : PanoPeripheralDelegate {
     func panoPeripheralDidConnect(_ panoPeripheral: PanoPeripheral){
@@ -261,7 +378,7 @@ extension Pano : PanoPeripheralDelegate {
     }
 }
 
-// MARK: -- MenuDelegate
+// MARK: - MenuDelegate
 // Receive user menu selections and update the configuration
 
 extension Pano: MenuItemDelegate {
@@ -282,6 +399,7 @@ extension Pano: MenuItemDelegate {
             case 23: (self.sensorWidth, self.sensorHeight) = (24, 36)
             default: break
             }
+        case .gridOrder:   self.gridOrder = value as! GridOrder
         case .infiniteRotation: self.infiniteRotation = value as! Bool
         case .zeroMotionWait: self.zeroMotionWait = value as! Double
         case .stabilized: self.stabilizationStops = value as! Bool ? 2 : 0;
