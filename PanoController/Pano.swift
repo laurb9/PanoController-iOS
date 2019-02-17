@@ -60,6 +60,13 @@ extension Double {
     }
 }
 
+/**
+ Pano Controller class is the counterpart to the Firmware running on the platform.
+ - is configured by the Menu
+ - sends instructions to platform in the form of G-code
+ - receives status updates from platform
+ - exposes its status to the View
+ */
 class Pano : NSObject {
     enum State {
         case Idle
@@ -74,7 +81,8 @@ class Pano : NSObject {
         case ColumnFirst
     }
 
-    // Configuration
+    // MARK: - Pano Configuration
+
     /// Focal length, in mm
     var focalLength = 35.0
     /// Sensor width, in mm
@@ -106,7 +114,8 @@ class Pano : NSObject {
     /// Pano execution order, RowFirst does complete rows, ColumnFirst does complete columns
     var gridOrder: GridOrder = .RowFirst
 
-    // State
+    // MARK: - Pano State
+
     /// linear position of this shot (0..<rows*cols)
     var position = 0
 
@@ -119,6 +128,8 @@ class Pano : NSObject {
     var rows = 0
     /// Computed number of columns needed to cover the vertical pano FOV
     var cols = 0
+
+    // MARK: - G-code Generation
 
     // G-Code Interpreter Status and Configs
     /// Hardware platform configuration received from remote
@@ -184,51 +195,66 @@ class Pano : NSObject {
         }
     }
 
+    // MARK: - Move Calculator
+
+    /**
+     Convert photo position to row,col coordinates, taking into account grid order
+     - Parameter pos: photo index position 0..<row*col
+     - Returns: (row, col) as grid coordinates
+     */
+    func positionToRowCol(_ pos: Int) -> (row: Int, col: Int){
+        let currentRow: Int
+        let currentCol: Int
+        switch gridOrder {
+        case .RowFirst:
+            currentRow = pos / cols
+            currentCol = pos % cols
+        case .ColumnFirst:
+            currentRow = pos % rows
+            currentCol = pos / rows
+        }
+        return (currentRow, currentCol)
+    }
+
+    /**
+     Convert photo position to row,col coordinates, taking into account grid order
+     - Parameter row: row grid coordinate
+     - Parameter col: col grid coordinate
+     - Returns: photo index position 0..<row*col
+     */
+    func rowColToPosition(row: Int, col: Int) -> Int {
+        let pos: Int
+        switch gridOrder {
+        case .RowFirst:
+            pos = row * cols + col;
+        case .ColumnFirst:
+            pos = row + col * rows;
+        }
+        return pos
+    }
+
     /**
      Move to next grid position respecting current grid order
      - Returns: `(horizMove, vertMove)` as relative movement in degrees to reach the next cell in the pano sequence. Will return (0, 0) when end of pano is reached.
      */
     func moveToNextPosition() -> (Double, Double) {
-        let horiz: Double
-        let vert: Double
-        switch gridOrder {
-        case .RowFirst:
-            (horiz, vert) = moveTo(to: position + 1)
-        case .ColumnFirst:
-            if position == rows * cols - 1 {
-                (horiz, vert) = (0.0, 0.0)
-            } else if position < (rows-1) * cols {
-                (horiz, vert) = moveTo(to: position + cols)
-            } else {
-                 // last row, rewind to top (will return 0,0 when out of bounds)
-                (horiz, vert) = moveTo(to: (position % cols) + 1 )
-            }
-        }
-        return (horiz, vert)
+        let (row, col) = positionToRowCol(position + 1)
+        return moveTo(row: row, col: col)
     }
 
     /**
-     Move to photo index position (0..<number of photos)
-     - Parameter to: linear cell index aka photo number
-     - Returns: `(horizMove, vertMove)` as relative movement in degrees to reach the next cell in the pano sequence, or `(0.0, 0.0)` if the next cell is outside the pano bounds.
-     */
-    func moveTo(to targetPosition: Int) -> (Double, Double) {
-        return moveTo(row: targetPosition / cols, col: targetPosition % cols);
-    }
-
-    /**
-     Move to specified grid coordinates
+     Move to specified grid coordinates and update position
      - Parameter row: requested row position 0..<rows
      - Parameter col: request column position 0..<col
      - Returns: `(horizMove, vertMove)` as relative movement in degrees to reach the requested grid location, or `(0.0, 0.0)` if the location is outside the pano bounds.
      */
     func moveTo(row: Int, col: Int) -> (Double, Double) {
-        let currentRow = position / cols
-        let currentCol = position % cols
         var horizMove = 0.0
         var vertMove = 0.0
 
+        let (currentRow, currentCol) = positionToRowCol(position)
         if (currentRow >= rows ||
+            currentCol >= cols ||
             row >= rows ||
             col >= cols ||
             col < 0 ||
@@ -256,7 +282,7 @@ class Pano : NSObject {
             // vertical adjustment needed
             vertMove = Double(currentRow - row) * vertCellMove;
         }
-        position = row * cols + col;
+        position = rowColToPosition(row: row, col: col);
         return (horizMove, vertMove)
     }
 
@@ -324,7 +350,7 @@ class Pano : NSObject {
     }
 }
 
-// MARK: -- PanoPeripheralDelegate
+// MARK: - PanoPeripheralDelegate
 
 extension Pano : PanoPeripheralDelegate {
     func panoPeripheralDidConnect(_ panoPeripheral: PanoPeripheral){
@@ -352,7 +378,7 @@ extension Pano : PanoPeripheralDelegate {
     }
 }
 
-// MARK: -- MenuDelegate
+// MARK: - MenuDelegate
 // Receive user menu selections and update the configuration
 
 extension Pano: MenuItemDelegate {

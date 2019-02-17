@@ -73,15 +73,6 @@ class PanoControllerTests: XCTestCase {
         XCTAssertEqual(pano.vertCellMove, 28.74, accuracy: 0.01)
     }
 
-    private func checkMoveMethod(method: (Int)->(Double, Double), against expectedGridMoves: [(Int, Int, Int)]){
-        for (position, expectHorizMove, expectVertMove) in expectedGridMoves {
-            let (horizMove, vertMove) = method(position)
-            if Int(horizMove) != expectHorizMove || Int(vertMove) != expectVertMove {
-                XCTFail("moveTo(to: \(position)): got \(Int(horizMove)),\(Int(vertMove)) expected \(expectHorizMove),\(expectVertMove)")
-            }
-        }
-    }
-
     // Test direct access cell sweep by cell grid coordinates
     func testGridMoveTo(){
         // regular field-limited pano 2x3
@@ -111,31 +102,44 @@ class PanoControllerTests: XCTestCase {
         }
     }
 
-    // Test direct access cell sweep by linear shot position
-    func testMoveToPosition(){
+    func testPositionToRowCol(){
         // regular field-limited pano 2x3
-        // Col -    0 1 2 *50
+        // Row first mode
+        // Col -    0 1 2
         //        .------
-        // Row 0  | 0 1 2
-        // *-30 1 | 3 4 5
+        // Row  0 | 0 1 2
+        //      1 | 3 4 5
+        // Column first mode
+        //        .------
+        // Row  0 | 0 2 4
+        //      1 | 1 3 5
         pano.rows = 2
         pano.cols = 3
-        pano.horizCellMove = 50
-        pano.vertCellMove = 30
-        pano.position = 0
-        let expectedGridMoves = [
-            (0,    0,    0),
-            (1,   50,    0),
-            (2,   50,    0),
-            (4,  -50,  -30),
-            (1,    0,   30),
-            (5,   50,  -30),
-            (0, -100,   30)
+        let positionToRowColMap : [Pano.GridOrder: [(Int, Int, Int)]] = [
+            .RowFirst: [
+                (0, 0, 0),
+                (1, 0, 1),
+                (2, 0, 2),
+                (3, 1, 0),
+                (4, 1, 1),
+                (5, 1, 2),
+            ],
+            .ColumnFirst: [
+                (0, 0, 0),
+                (1, 1, 0),
+                (2, 0, 1),
+                (3, 1, 1),
+                (4, 0, 2),
+                (5, 1, 2),
+            ]
         ]
-        for (position, expectHorizMove, expectVertMove) in expectedGridMoves {
-            let (horizMove, vertMove) = pano.moveTo(to: position)
-            if Int(horizMove) != expectHorizMove || Int(vertMove) != expectVertMove {
-                XCTFail("moveTo(to: \(position)): got \(Int(horizMove)),\(Int(vertMove)) expected \(expectHorizMove),\(expectVertMove)")
+        for (gridOrder, expectedMap) in positionToRowColMap {
+            pano.gridOrder = gridOrder
+            for (position, expectRow, expectCol) in expectedMap {
+                let (row, col) = pano.positionToRowCol(position)
+                if row != expectRow || col != expectCol {
+                    XCTFail("order \(gridOrder) pos \(position): got \(row),\(col) expected \(expectRow),\(expectCol)")
+                }
             }
         }
     }
